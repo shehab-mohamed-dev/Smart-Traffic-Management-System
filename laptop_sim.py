@@ -46,7 +46,7 @@ def main():
     font = pygame.font.SysFont(None, 24)
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try: client.connect(('127.0.0.1', 65432))
+    try: client.connect(('10.31.65.50', 65432))
     except ConnectionRefusedError: print("❌ ERROR: Run pi_brain.py!"); sys.exit()
 
     all_cars = reset_simulation()

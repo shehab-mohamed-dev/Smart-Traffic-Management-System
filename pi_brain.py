@@ -80,7 +80,7 @@ def run_server():
     brain = TrafficBrain()
     stats = StatisticsHandler()
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(('127.0.0.1', 65432)) 
+    server.bind(('10.31.65.50', 65432)) 
     server.listen()
     print("🚦 Virtual Raspberry Pi Brain is listening on port 65432...")
     last_csv_save = time.time()
