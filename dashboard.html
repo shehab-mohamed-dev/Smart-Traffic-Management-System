@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Grid Traffic Control Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['Share Tech Mono', 'monospace'],
+            display: ['Orbitron', 'sans-serif'],
+            body: ['Rajdhani', 'sans-serif'],
+          },
+          colors: {
+            'neon-cyan': '#00f5ff',
+            'neon-green': '#39ff14',
+            'neon-amber': '#ffb300',
+            'neon-red': '#ff2d55',
+            'neon-blue': '#4d9fff',
+            'panel': '#0a0f1e',
+            'panel-2': '#0d1526',
+            'panel-3': '#111c35',
+            'border-dim': '#1e3a5f',
+            'border-glow': '#1a4a7a',
+          },
+          boxShadow: {
+            'glow-cyan': '0 0 12px rgba(0,245,255,0.35), inset 0 0 12px rgba(0,245,255,0.05)',
+            'glow-green': '0 0 12px rgba(57,255,20,0.35), inset 0 0 12px rgba(57,255,20,0.05)',
+            'glow-amber': '0 0 12px rgba(255,179,0,0.35), inset 0 0 12px rgba(255,179,0,0.05)',
+            'glow-red': '0 0 12px rgba(255,45,85,0.35), inset 0 0 12px rgba(255,45,85,0.05)',
+            'glow-blue': '0 0 12px rgba(77,159,255,0.35), inset 0 0 12px rgba(77,159,255,0.05)',
+            'panel': '0 4px 32px rgba(0,0,0,0.6)',
+          },
+          animation: {
+            'blink': 'blink 1.4s ease-in-out infinite',
+            'scan': 'scan 4s linear infinite',
+            'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+            'slide-in': 'slideIn 0.4s ease-out',
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            blink: { '0%,100%': { opacity: '1' }, '50%': { opacity: '0.1' } },
+            scan: { '0%': { transform: 'translateY(-100%)' }, '100%': { transform: 'translateY(400%)' } },
+            pulseGlow: { '0%,100%': { boxShadow: '0 0 8px rgba(0,245,255,0.2)' }, '50%': { boxShadow: '0 0 24px rgba(0,245,255,0.6)' } },
+            slideIn: { '0%': { opacity: '0', transform: 'translateX(-12px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } },
+            float: { '0%,100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-6px)' } },
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: #06090f;
+      background-image:
+        radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0,100,180,0.15) 0%, transparent 70%),
+        linear-gradient(180deg, #06090f 0%, #080d18 100%);
+      min-height: 100vh;
+      font-family: 'Rajdhani', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Grid background pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,100,200,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,100,200,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .z1 { position: relative; z-index: 1; }
+
+    /* Panel base */
+    .panel {
+      background: linear-gradient(135deg, #0d1526 0%, #0a0f1e 100%);
+      border: 1px solid #1e3a5f;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,245,255,0.5), transparent);
+    }
+
+    /* Corner accents */
+    .corner-accent::after,
+    .corner-accent::before {
+      content: '';
+      position: absolute;
+      width: 12px; height: 12px;
+      border-color: #00f5ff;
+      border-style: solid;
+      opacity: 0.7;
+    }
+    .corner-accent::before { top: 0; left: 0; border-width: 2px 0 0 2px; }
+    .corner-accent::after  { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+    /* KPI card glow variants */
+    .kpi-cyan  { border-color: #00f5ff44; box-shadow: 0 0 16px rgba(0,245,255,0.12), inset 0 0 20px rgba(0,245,255,0.03); }
+    .kpi-green { border-color: #39ff1444; box-shadow: 0 0 16px rgba(57,255,20,0.12), inset 0 0 20px rgba(57,255,20,0.03); }
+    .kpi-amber { border-color: #ffb30044; box-shadow: 0 0 16px rgba(255,179,0,0.12), inset 0 0 20px rgba(255,179,0,0.03); }
+    .kpi-red   { border-color: #ff2d5544; box-shadow: 0 0 16px rgba(255,45,85,0.12), inset 0 0 20px rgba(255,45,85,0.03); }
+
+    .kpi-cyan  .kpi-val { color: #00f5ff; text-shadow: 0 0 20px rgba(0,245,255,0.8); }
+    .kpi-green .kpi-val { color: #39ff14; text-shadow: 0 0 20px rgba(57,255,20,0.8); }
+    .kpi-amber .kpi-val { color: #ffb300; text-shadow: 0 0 20px rgba(255,179,0,0.8); }
+    .kpi-red   .kpi-val { color: #ff2d55; text-shadow: 0 0 20px rgba(255,45,85,0.8); }
+
+    .kpi-cyan  .kpi-bar  { background: linear-gradient(90deg, #00f5ff, #00a0aa); }
+    .kpi-green .kpi-bar  { background: linear-gradient(90deg, #39ff14, #1a7a00); }
+    .kpi-amber .kpi-bar  { background: linear-gradient(90deg, #ffb300, #a07000); }
+    .kpi-red   .kpi-bar  { background: linear-gradient(90deg, #ff2d55, #a00030); }
+
+    .kpi-bar-track { height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+    .kpi-bar { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+
+    /* Scan line animation */
+    .scan-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(0,245,255,0.3), transparent);
+      animation: scan 4s linear infinite;
+      pointer-events: none;
+    }
+
+    /* Status dot */
+    .status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #39ff14;
+      box-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14;
+      animation: blink 1.4s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    /* Header decor */
+    .header-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #00f5ff55, #4d9fff55, transparent);
+    }
+
+    /* Chart container */
+    .chart-panel canvas { display: block; }
+
+    /* Log entry animations */
+    .log-entry { animation: slideIn 0.4s ease-out; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0a0f1e; }
+    ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2a5080; }
+
+    /* Orbitron display */
+    .font-display { font-family: 'Orbitron', sans-serif; }
+    .font-mono-tech { font-family: 'Share Tech Mono', monospace; }
+
+    /* Active breakdown alert */
+    .kpi-red.alert-active {
+      animation: pulseGlow 1.5s ease-in-out infinite;
+      border-color: #ff2d5577 !important;
+    }
+
+    /* Mini map grid */
+    .grid-map-cell {
+      width: 100%;
+      aspect-ratio: 1;
+      border: 1px solid #1e3a5f22;
+      border-radius: 2px;
+      transition: background 0.5s ease;
+    }
+
+    /* Decorative top bar */
+    .top-bar-segment {
+      height: 3px;
+      flex: 1;
+      opacity: 0.7;
+    }
+
+    /* Throughput gauge ring */
+    .gauge-ring {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .connection-status {
+      transition: color 0.3s ease;
+    }
+
+    .data-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,245,255,0.06);
+      border: 1px solid rgba(0,245,255,0.15);
+      border-radius: 3px;
+      padding: 3px 10px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: rgba(0,245,255,0.7);
+    }
+
+    /* Subtle noise texture overlay */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="noise-overlay"></div>
+
+  <!-- Top color bar -->
+  <div class="flex w-full z1" style="height:3px;">
+    <div class="top-bar-segment" style="background:linear-gradient(90deg,#00f5ff,#4d9fff);"></div>
+    <div class="top-bar-segment" style="background:linear-gradient(90deg,#4d9fff,#39ff14);"></div>
+    <div class="top-bar-segment" style="background:linear-gradient(90deg,#39ff14,#ffb300);"></div>
+    <div class="top-bar-segment" style="background:linear-gradient(90deg,#ffb300,#ff2d55);"></div>
+  </div>
+
+  <div class="z1 max-w-screen-2xl mx-auto px-4 pb-10 pt-6 space-y-5">
+
+    <!-- ═══════════════════════════════════ HEADER ═══════════════════════════════════ -->
+    <header class="panel corner-accent px-6 py-4">
+      <div class="scan-line"></div>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-4">
+          <div class="flex flex-col items-center justify-center w-12 h-12 rounded border border-neon-cyan/30 bg-neon-cyan/5" style="box-shadow:0 0 12px rgba(0,245,255,0.2);">
+            <span style="font-size:22px;">🚦</span>
+          </div>
+          <div>
+            <h1 class="font-display text-xl sm:text-2xl font-bold tracking-widest" style="color:#00f5ff;text-shadow:0 0 24px rgba(0,245,255,0.6),0 0 48px rgba(0,245,255,0.2);">
+              SMART GRID TRAFFIC CONTROL CENTER
+            </h1>
+            <p class="font-mono-tech text-xs mt-0.5" style="color:rgba(0,245,255,0.4);letter-spacing:0.2em;">
+              ADAPTIVE TRAFFIC MANAGEMENT SYSTEM · CAPSTONE PROJECT
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 flex-wrap">
+          <div class="data-badge">
+            <span>NODE</span>
+            <span id="hdr-timestamp" style="color:#00f5ff;">--:--:--</span>
+          </div>
+          <div class="flex items-center gap-2 bg-neon-green/5 border border-neon-green/20 rounded px-3 py-1.5">
+            <span class="status-dot"></span>
+            <span class="font-mono-tech text-xs font-semibold tracking-wider" style="color:#39ff14;">SYSTEM ONLINE · LIVE DATA</span>
+          </div>
+          <div id="connection-badge" class="data-badge connection-status" style="color:rgba(255,179,0,0.6);">
+            ◌ CONNECTING...
+          </div>
+        </div>
+      </div>
+      <div class="header-line mt-4"></div>
+    </header>
+
+    <!-- ═══════════════════════════════════ KPI CARDS ═══════════════════════════════════ -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <!-- Density -->
+      <div class="panel corner-accent kpi-cyan p-5 flex flex-col justify-between" style="min-height:140px;">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="font-mono-tech text-xs tracking-widest mb-1" style="color:rgba(0,245,255,0.5);">TRAFFIC DENSITY</p>
+            <p class="text-4xl font-bold kpi-val font-display" id="kpi-density">--</p>
+            <p class="font-mono-tech text-xs mt-1" style="color:rgba(0,245,255,0.35);">vehicles/km²</p>
+          </div>
+          <div class="text-3xl opacity-80">🚗</div>
+        </div>
+        <div>
+          <div class="flex justify-between font-mono-tech text-xs mb-1" style="color:rgba(0,245,255,0.4);">
+            <span>LOAD</span><span id="kpi-density-pct">0%</span>
+          </div>
+          <div class="kpi-bar-track"><div class="kpi-bar" id="bar-density" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- Avg Delay -->
+      <div class="panel corner-accent kpi-amber p-5 flex flex-col justify-between" style="min-height:140px;">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="font-mono-tech text-xs tracking-widest mb-1" style="color:rgba(255,179,0,0.5);">AVG DELAY</p>
+            <p class="text-4xl font-bold kpi-val font-display" id="kpi-delay">--</p>
+            <p class="font-mono-tech text-xs mt-1" style="color:rgba(255,179,0,0.35);">seconds / vehicle</p>
+          </div>
+          <div class="text-3xl opacity-80">⏱️</div>
+        </div>
+        <div>
+          <div class="flex justify-between font-mono-tech text-xs mb-1" style="color:rgba(255,179,0,0.4);">
+            <span>SEVERITY</span><span id="kpi-delay-pct">0%</span>
+          </div>
+          <div class="kpi-bar-track"><div class="kpi-bar" id="bar-delay" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- Throughput -->
+      <div class="panel corner-accent kpi-green p-5 flex flex-col justify-between" style="min-height:140px;">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="font-mono-tech text-xs tracking-widest mb-1" style="color:rgba(57,255,20,0.5);">THROUGHPUT</p>
+            <p class="text-4xl font-bold kpi-val font-display" id="kpi-throughput">--</p>
+            <p class="font-mono-tech text-xs mt-1" style="color:rgba(57,255,20,0.35);">vehicles / min</p>
+          </div>
+          <div class="text-3xl opacity-80">📊</div>
+        </div>
+        <div>
+          <div class="flex justify-between font-mono-tech text-xs mb-1" style="color:rgba(57,255,20,0.4);">
+            <span>EFFICIENCY</span><span id="kpi-throughput-pct">0%</span>
+          </div>
+          <div class="kpi-bar-track"><div class="kpi-bar" id="bar-throughput" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- Breakdowns -->
+      <div class="panel corner-accent kpi-red p-5 flex flex-col justify-between" id="card-breakdowns" style="min-height:140px;">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="font-mono-tech text-xs tracking-widest mb-1" style="color:rgba(255,45,85,0.5);">ACTIVE BREAKDOWNS</p>
+            <p class="text-4xl font-bold kpi-val font-display" id="kpi-breakdowns">--</p>
+            <p class="font-mono-tech text-xs mt-1" style="color:rgba(255,45,85,0.35);">lane blockages</p>
+          </div>
+          <div class="text-3xl opacity-80">🚧</div>
+        </div>
+        <div>
+          <div class="flex justify-between font-mono-tech text-xs mb-1" style="color:rgba(255,45,85,0.4);">
+            <span>IMPACT</span>
+            <span id="kpi-breakdown-status" class="font-bold">NOMINAL</span>
+          </div>
+          <div class="kpi-bar-track"><div class="kpi-bar" id="bar-breakdowns" style="width:0%"></div></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ═══════════════════════════════════ MAIN CONTENT ═══════════════════════════════════ -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+
+      <!-- Chart (2/3 width) -->
+      <div class="xl:col-span-2 panel corner-accent chart-panel p-5" style="min-height:380px;">
+        <div class="scan-line"></div>
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="font-display text-sm font-bold tracking-widest" style="color:#00f5ff;">FLOW ANALYTICS · REAL-TIME</h2>
+            <p class="font-mono-tech text-xs mt-0.5" style="color:rgba(0,245,255,0.35);">LAST 20 DATAPOINTS · 5-SECOND INTERVALS</p>
+          </div>
+          <div class="flex items-center gap-4 text-xs font-mono-tech">
+            <span class="flex items-center gap-1.5"><span style="display:inline-block;width:20px;height:2px;background:#4d9fff;box-shadow:0 0 6px #4d9fff;border-radius:1px;"></span><span style="color:rgba(77,159,255,0.7);">DENSITY</span></span>
+            <span class="flex items-center gap-1.5"><span style="display:inline-block;width:20px;height:2px;background:#39ff14;box-shadow:0 0 6px #39ff14;border-radius:1px;"></span><span style="color:rgba(57,255,20,0.7);">THROUGHPUT</span></span>
+          </div>
+        </div>
+        <div style="height: 290px; position:relative;">
+          <canvas id="trafficChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Secondary metrics (1/3 width) -->
+      <div class="flex flex-col gap-4">
+
+        <!-- Emergency status -->
+        <div class="panel corner-accent p-5 flex-1" id="emergency-panel">
+          <h2 class="font-display text-xs font-bold tracking-widest mb-3" style="color:#00f5ff;">EMERGENCY STATUS</h2>
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="font-mono-tech text-xs mb-1" style="color:rgba(255,255,255,0.4);">ACTIVE UNITS</p>
+              <p class="font-display text-5xl font-black" id="emergency-count" style="color:#ff2d55;text-shadow:0 0 24px rgba(255,45,85,0.7);">0</p>
+            </div>
+            <div class="text-6xl" id="emergency-icon">🟢</div>
+          </div>
+          <div class="header-line mt-3 mb-2"></div>
+          <p class="font-mono-tech text-xs" id="emergency-status-text" style="color:rgba(57,255,20,0.6);">◉ ALL INTERSECTIONS NOMINAL</p>
+        </div>
+
+        <!-- System health mini metrics -->
+        <div class="panel corner-accent p-5 flex-1">
+          <h2 class="font-display text-xs font-bold tracking-widest mb-3" style="color:#00f5ff;">SYSTEM VITALS</h2>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="font-mono-tech text-xs" style="color:rgba(255,255,255,0.4);">DATA FEED</span>
+              <span class="font-mono-tech text-xs" id="vital-feed" style="color:#39ff14;">● ACTIVE</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="font-mono-tech text-xs" style="color:rgba(255,255,255,0.4);">UPDATE RATE</span>
+              <span class="font-mono-tech text-xs" style="color:#00f5ff;">~5s INTERVAL</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="font-mono-tech text-xs" style="color:rgba(255,255,255,0.4);">DATA POINTS</span>
+              <span class="font-mono-tech text-xs" id="vital-datapoints" style="color:#ffb300;">0</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="font-mono-tech text-xs" style="color:rgba(255,255,255,0.4);">LAST UPDATE</span>
+              <span class="font-mono-tech text-xs" id="vital-lastupdate" style="color:#00f5ff;">--:--:--</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="font-mono-tech text-xs" style="color:rgba(255,255,255,0.4);">DB CONNECTION</span>
+              <span class="font-mono-tech text-xs" id="vital-db" style="color:#ffb300;">● INIT...</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ EVENT LOG ═══════════════════════════════════ -->
+    <section class="panel corner-accent p-5">
+      <div class="scan-line"></div>
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="font-display text-sm font-bold tracking-widest" style="color:#00f5ff;">LIVE EVENT LOG · INCIDENT MONITOR</h2>
+          <p class="font-mono-tech text-xs mt-0.5" style="color:rgba(0,245,255,0.35);">MAX 10 ENTRIES · AUTO-SCROLL</p>
+        </div>
+        <div class="flex gap-2">
+          <span class="data-badge"><span style="color:#ff2d55;">●</span> EMERGENCY</span>
+          <span class="data-badge"><span style="color:#ffb300;">●</span> BREAKDOWN</span>
+          <span class="data-badge"><span style="color:rgba(255,255,255,0.3);">●</span> SYSTEM</span>
+        </div>
+      </div>
+      <div id="event-log" class="space-y-1.5 overflow-y-auto" style="max-height: 200px; min-height: 80px;">
+        <div class="font-mono-tech text-xs px-3 py-2 rounded log-entry" style="background:rgba(0,245,255,0.03);border:1px solid rgba(0,245,255,0.08);color:rgba(255,255,255,0.3);">
+          ◌ Awaiting live data stream from Firebase...
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center font-mono-tech text-xs py-2" style="color:rgba(255,255,255,0.15);letter-spacing:0.2em;">
+      SMART ADAPTIVE TRAFFIC MANAGEMENT SYSTEM · CAPSTONE PROJECT · FIREBASE REALTIME DATABASE · ALL RIGHTS RESERVED
+    </footer>
+
+  </div><!-- end container -->
+
+  <!-- ═══════════════════════════════════ SCRIPTS ═══════════════════════════════════ -->
+  <!-- Firebase SDK (v10 modular) -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+    // ─── Firebase Config ───────────────────────────────────────────────────────
+    const firebaseConfig = {
+      databaseURL: 'https://smarttraffic-cps-default-rtdb.firebaseio.com/'
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+
+    // ─── Chart.js Setup ────────────────────────────────────────────────────────
+    const MAX_POINTS = 20;
+    const chartLabels    = [];
+    const densityData    = [];
+    const throughputData = [];
+
+    const ctx = document.getElementById('trafficChart').getContext('2d');
+
+    // Gradient fills
+    const densityGrad = ctx.createLinearGradient(0, 0, 0, 280);
+    densityGrad.addColorStop(0,   'rgba(77,159,255,0.25)');
+    densityGrad.addColorStop(1,   'rgba(77,159,255,0.00)');
+
+    const throughputGrad = ctx.createLinearGradient(0, 0, 0, 280);
+    throughputGrad.addColorStop(0,  'rgba(57,255,20,0.20)');
+    throughputGrad.addColorStop(1,  'rgba(57,255,20,0.00)');
+
+    const trafficChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: chartLabels,
+        datasets: [
+          {
+            label: 'Density',
+            data: densityData,
+            borderColor: '#4d9fff',
+            backgroundColor: densityGrad,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: '#4d9fff',
+            pointBorderColor: '#0a0f1e',
+            pointBorderWidth: 1.5,
+            tension: 0.45,
+            fill: true,
+            yAxisID: 'y',
+          },
+          {
+            label: 'Throughput',
+            data: throughputData,
+            borderColor: '#39ff14',
+            backgroundColor: throughputGrad,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: '#39ff14',
+            pointBorderColor: '#0a0f1e',
+            pointBorderWidth: 1.5,
+            tension: 0.45,
+            fill: true,
+            yAxisID: 'y',
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 600, easing: 'easeInOutQuart' },
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0d1526',
+            borderColor: '#1e3a5f',
+            borderWidth: 1,
+            titleColor: '#00f5ff',
+            bodyColor: 'rgba(255,255,255,0.7)',
+            titleFont: { family: 'Share Tech Mono', size: 11 },
+            bodyFont:  { family: 'Share Tech Mono', size: 11 },
+            padding: 10,
+            displayColors: true,
+            callbacks: {
+              title: (items) => '⏱ ' + items[0].label,
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: 'rgba(0,245,255,0.4)',
+              font: { family: 'Share Tech Mono', size: 9 },
+              maxRotation: 45,
+              maxTicksLimit: 10,
+            },
+            grid: {
+              color: 'rgba(0,100,200,0.08)',
+              borderColor: 'rgba(0,245,255,0.15)',
+            }
+          },
+          y: {
+            ticks: {
+              color: 'rgba(0,245,255,0.4)',
+              font: { family: 'Share Tech Mono', size: 9 },
+            },
+            grid: {
+              color: 'rgba(0,100,200,0.08)',
+              borderColor: 'rgba(0,245,255,0.15)',
+            },
+            beginAtZero: true,
+          }
+        }
+      }
+    });
+
+    // ─── Helpers ───────────────────────────────────────────────────────────────
+    let totalDataPoints = 0;
+
+    function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
+
+    function setEl(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    function appendLog(msg, color) {
+      const log = document.getElementById('event-log');
+      if (!log) return;
+
+      // Remove placeholder if present
+      const placeholder = log.querySelector('[data-placeholder]');
+      if (placeholder) placeholder.remove();
+
+      const entry = document.createElement('div');
+      entry.className = 'log-entry font-mono-tech text-xs px-3 py-2 rounded flex items-start gap-2';
+      entry.style.cssText = `color:${color};background:${color}0d;border:1px solid ${color}22;`;
+      entry.innerHTML = msg;
+
+      log.prepend(entry);
+
+      // Keep max 10 entries
+      while (log.children.length > 10) {
+        log.removeChild(log.lastChild);
+      }
+    }
+
+    function addSystemLog(msg) {
+      appendLog(`<span style="color:rgba(255,255,255,0.25);">◌</span> <span style="color:rgba(255,255,255,0.4);">${msg}</span>`, 'rgba(255,255,255,0.15)');
+    }
+
+    // ─── Firebase Listener ─────────────────────────────────────────────────────
+    const liveRef = ref(db, '/live_stats');
+
+    // Connection status marker
+    setEl('vital-db', '● CONNECTING');
+    document.getElementById('vital-db').style.color = '#ffb300';
+
+    let connected = false;
+    let prevEmergencies = 0;
+    let prevBreakdowns  = 0;
+
+    onValue(liveRef, (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      if (!connected) {
+        connected = true;
+        setEl('vital-db', '● CONNECTED');
+        document.getElementById('vital-db').style.color = '#39ff14';
+        document.getElementById('connection-badge').textContent = '✓ FIREBASE CONNECTED';
+        document.getElementById('connection-badge').style.color = 'rgba(57,255,20,0.7)';
+        addSystemLog('Firebase Realtime Database connection established.');
+      }
+
+      const { avg_delay, breakdowns, density, emergencies, throughput, timestamp } = data;
+      totalDataPoints++;
+
+      // ── Update header timestamp ──
+      setEl('hdr-timestamp', timestamp ?? '--:--:--');
+      setEl('vital-lastupdate', timestamp ?? '--:--:--');
+      setEl('vital-datapoints', totalDataPoints);
+
+      // ── KPI cards ──
+      const densityVal    = density    ?? 0;
+      const delayVal      = avg_delay  ?? 0;
+      const throughputVal = throughput ?? 0;
+      const breakdownsVal = breakdowns ?? 0;
+      const emergencyVal  = emergencies ?? 0;
+
+      setEl('kpi-density',    densityVal);
+      setEl('kpi-delay',      delayVal.toFixed(2) + 's');
+      setEl('kpi-throughput', throughputVal);
+      setEl('kpi-breakdowns', breakdownsVal);
+
+      // Progress bars (normalized to sensible max values)
+      const densityPct    = clamp((densityVal / 60) * 100, 0, 100);
+      const delayPct      = clamp((delayVal / 30) * 100, 0, 100);
+      const throughputPct = clamp((throughputVal / 120) * 100, 0, 100);
+
+      document.getElementById('bar-density').style.width    = densityPct + '%';
+      document.getElementById('bar-delay').style.width      = delayPct + '%';
+      document.getElementById('bar-throughput').style.width = throughputPct + '%';
+      document.getElementById('bar-breakdowns').style.width = breakdownsVal > 0 ? '100%' : '0%';
+
+      setEl('kpi-density-pct',    Math.round(densityPct) + '%');
+      setEl('kpi-delay-pct',      Math.round(delayPct) + '%');
+      setEl('kpi-throughput-pct', Math.round(throughputPct) + '%');
+
+      const bCard = document.getElementById('card-breakdowns');
+      if (breakdownsVal > 0) {
+        bCard.classList.add('alert-active');
+        setEl('kpi-breakdown-status', 'CRITICAL');
+      } else {
+        bCard.classList.remove('alert-active');
+        setEl('kpi-breakdown-status', 'NOMINAL');
+      }
+
+      // ── Emergency panel ──
+      setEl('emergency-count', emergencyVal);
+      const emergPanel      = document.getElementById('emergency-panel');
+      const emergIcon       = document.getElementById('emergency-icon');
+      const emergStatusText = document.getElementById('emergency-status-text');
+
+      if (emergencyVal > 0) {
+        emergPanel.style.boxShadow    = '0 0 20px rgba(255,45,85,0.25), inset 0 0 20px rgba(255,45,85,0.06)';
+        emergPanel.style.borderColor  = 'rgba(255,45,85,0.4)';
+        emergIcon.textContent         = '🔴';
+        emergStatusText.textContent   = '⚠ EMERGENCY OVERRIDE ACTIVE';
+        emergStatusText.style.color   = '#ff2d55';
+      } else {
+        emergPanel.style.boxShadow    = '';
+        emergPanel.style.borderColor  = '';
+        emergIcon.textContent         = '🟢';
+        emergStatusText.textContent   = '◉ ALL INTERSECTIONS NOMINAL';
+        emergStatusText.style.color   = 'rgba(57,255,20,0.6)';
+      }
+
+      // ── Chart update ──
+      chartLabels.push(timestamp ?? '');
+      densityData.push(densityVal);
+      throughputData.push(throughputVal);
+
+      if (chartLabels.length > MAX_POINTS) {
+        chartLabels.shift();
+        densityData.shift();
+        throughputData.shift();
+      }
+
+      trafficChart.update();
+
+      // ── Event log ──
+      const ts = timestamp ?? '??:??:??';
+
+      if (emergencyVal > 0 && emergencyVal !== prevEmergencies) {
+        appendLog(
+          `<span style="color:rgba(255,45,85,0.6);">[${ts}]</span> 🚑 <strong>EMERGENCY VEHICLE DETECTED</strong> — INTERSECTION OVERRIDE ACTIVE`,
+          '#ff2d55'
+        );
+      }
+
+      if (breakdownsVal > 0 && breakdownsVal !== prevBreakdowns) {
+        appendLog(
+          `<span style="color:rgba(255,179,0,0.6);">[${ts}]</span> ⚠️ <strong>VEHICLE BREAKDOWN DETECTED</strong> — LANE BLOCKED`,
+          '#ffb300'
+        );
+      }
+
+      prevEmergencies = emergencyVal;
+      prevBreakdowns  = breakdownsVal;
+
+    }, (error) => {
+      console.error('Firebase error:', error);
+      setEl('vital-db', '● ERROR');
+      document.getElementById('vital-db').style.color = '#ff2d55';
+      document.getElementById('vital-feed').textContent = '● DISCONNECTED';
+      document.getElementById('vital-feed').style.color = '#ff2d55';
+      document.getElementById('connection-badge').textContent = '✗ CONNECTION FAILED';
+      document.getElementById('connection-badge').style.color = 'rgba(255,45,85,0.8)';
+      addSystemLog('ERROR: Firebase connection failed. Check console for details.');
+    });
+
+  </script>
+</body>
+</html>
