@@ -76,6 +76,7 @@ struct ActiveCar {
     uint32_t start_tick;
 };
 
+
 // PI -> CAR
 
 //Message sent from the traffic handler in the pi to the cars
@@ -100,24 +101,24 @@ struct stop_command {
 
 // Represents the incoming request before it gets approved
 struct routeRequest {
-    unsigned int car_id;
-    RouteID requested_route;
-    carMessage type;
+    carMessage type; //1 byte
+    uint32_t car_id; //4 bytes
+    RouteID requested_route; //1 byte
 }; 
 
 // Car updating pi about its current position
 struct telemetryPayload {
-    uint32_t car_id;
-    float current_x;
-    float current_y;
-    uint32_t timeStamp;
-    carMessage type;
+    carMessage type; // 1 byte
+    uint32_t car_id; // 4 bytes
+    float current_x; // 4 bytes 
+    float current_y; // 4 bytes
+    uint32_t timeStamp; //4 bytes
 };
 
 // Car saying it has reached it destination
 struct routeComplete {
-    carMessage type;
-    uint32_t car_id;
+    carMessage type; // 1 byte
+    uint32_t car_id; // 4 bytes
 };
 
 
