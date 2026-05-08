@@ -8,8 +8,7 @@
 #include <unistd.h>
 
 
-bool commsHandler::setup_onBoardingSocket()
-{
+bool commsHandler::setup_onBoardingSocket(){
     //Define the socket type
     //For our case we want a TCP socket
     //Choose IPV4, Choose protocol which is relible, sequenced, two-way byte stream.
@@ -70,25 +69,97 @@ void commsHandler::accept_clientSocket() {
             continue;
         }
 
-        RouteRequestPayload payload{};
-        if (!recvExact(carSocket, (uint8_t*)&payload, sizeof(RouteRequestPayload))) {
+        routeRequest request{};
+        if (!recvExact(carSocket, (uint8_t*)&request, sizeof(routeRequest)))
+        {
+            close(carSocket);
+            continue;
+        }
+
+        if (request.type != carMessage::PATH_REQUEST)
+        {
             close(carSocket);
             continue;
         }
 
 
-        
-
-
-        // Store the socket against the car ID so we can send to it later
-        {
-            std::lock_guard<std::mutex> lock(car_socket_mutex);
-            carSockets[car_id] = carSocket;
-        }
+        std::lock_guard<std::mutex> lock(car_socket_mutex);
+        carSockets[request.car_id] = carSocket;
 
         // Spawn a dedicated receive thread for this car
-        // This thread will block on recvExact waiting for messages from this car
-        std::thread car_thread(&commsHandler::receiveLoop, this, carSocket, car_id);
+        // Spawns a new thread to handle incoming data for this car using the receiveLoop member function.
+        std::thread car_thread(&commsHandler::receiveLoop, this, carSocket, request.car_id);
         car_thread.detach();
     }
+}
+
+void commsHandler::receiveLoop(int car_socket_fd, uint32_t car_id){
+    while (true)
+    {
+        // Every car message starts with a 1-byte carMessage type
+        carMessage msg_type{};
+        if (!recvExact(car_socket_fd, (uint8_t*)&msg_type, sizeof(carMessage)))
+        {
+            // Socket closed or error — remove car and exit thread
+            std::lock_guard<std::mutex> lock(car_socket_mutex);
+            carSockets.erase(car_id);
+            close(car_socket_fd);
+            return;
+        }
+
+        // We already consumed the type byte, so read only the remaining fields
+        switch (msg_type)
+        {
+            case carMessage::UPDATE_POSITION:
+            {
+
+            }
+
+            case carMessage::ROUTE_COMPLETE:
+            {
+
+            }
+
+            case carMessage::PATH_REQUEST:
+            default:
+
+                
+        }
+    }
+
+}
+
+void commsHandler::sendLoop(){
+    while (true)
+    {
+        std::unique_lock<std::mutex> lock(command_mutex);
+        command_cv.wait(lock, [this] { return !commandQueue.empty(); });
+
+        QueuedCommand cmd = commandQueue.front();
+        commandQueue.pop();
+        lock.unlock();
+
+        // Look up the socket for this car
+        int target_socket = -1;
+        {
+            std::lock_guard<std::mutex> slock(car_socket_mutex);
+            auto it = carSockets.find(cmd.car_id);
+            if (it == carSockets.end()) continue; // Car already disconnected
+            target_socket = it->second;
+        }
+
+        // Best-effort send — partial sends are not retried here
+        send(target_socket, cmd.buffer, cmd.size, 0);
+    }
+}
+
+bool commsHandler::recvExact(int socket_fd, uint8_t* buffer, size_t num_bytes){
+    size_t total = 0;
+    while (total < num_bytes)
+    {
+        ssize_t received = recv(socket_fd, buffer + total, num_bytes - total, 0);
+        if (received <= 0) return false; // Connection closed or error
+        total += received;
+    }
+    return true;
 }

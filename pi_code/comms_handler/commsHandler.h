@@ -89,3 +89,4 @@ public:
     void queuePathCommand(const path_command& cmd);
     void queueStopCommand(const stop_command& cmd);
 };
+
