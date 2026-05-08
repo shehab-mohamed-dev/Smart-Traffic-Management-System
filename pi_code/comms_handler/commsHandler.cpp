@@ -1,12 +1,27 @@
 #include "commsHandler.h"
 #include <cstdio>
 #include <cstring>
-#include <functional>
-#include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
 
+commsHandler::commsHandler(trafficHandler& handler, uint16_t port)
+    : handler(handler), onBoarding_port(port)
+{
+    if (!setup_onBoardingSocket())
+    {
+        std::cerr << "Failed to set up onboarding socket on port " << port << "\n";
+    }
+}
+
+void commsHandler::start_coms()
+{
+    // Accept thread — blocks waiting for new cars to connect
+    std::thread(&commsHandler::accept_clientSocket, this).detach();
+
+    // Send thread — blocks waiting for commands to appear in the queue
+    std::thread(&commsHandler::sendLoop, this).detach();
+}
 
 bool commsHandler::setup_onBoardingSocket(){
     //Define the socket type
@@ -39,10 +54,11 @@ bool commsHandler::setup_onBoardingSocket(){
     if(bind(onBoarding_socket,(struct sockaddr*)& onBoardingAddress, sizeof(onBoardingAddress)) < 0) { return false; }
 
     //Socket starts listening and a backlog of 5 connections can be made until the connections are refused
-    if(listen(onBoarding_socket,5) < 0) { return false; };
+    if(listen(onBoarding_socket,5) < 0) { return false; }
  
     return true;
 }
+
 void commsHandler::accept_clientSocket() {
 
     sockaddr_in CarAddress{};
@@ -55,40 +71,42 @@ void commsHandler::accept_clientSocket() {
         int carSocket = accept(onBoarding_socket, (struct sockaddr*)&CarAddress, &client_len);
         if (carSocket < 0) continue;
 
+        // Set 5 second timeout for handshake
+        // If car connects but never sends its request, we close and move on
+        struct timeval timeout{ .tv_sec = 5, .tv_usec = 0 };
+        setsockopt(carSocket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
-        // Read the message type first (assumed to be the first field, e.g. an enum/uint)
-        carMessage msg_type{};
-        if (!recvExact(carSocket, (uint8_t*)&msg_type, sizeof(carMessage))) {
+        // Read the full routeRequest into a raw buffer then deserialize
+        // Reading the full struct at once avoids the type byte misalignment problem
+        uint8_t buffer[sizeof(routeRequest)];
+        if (!recvExact(carSocket, buffer, sizeof(routeRequest))) {
             close(carSocket);
             continue;
         }
 
-        // Onboarding only accepts routeRequest — reject anything else immediately
-        if (msg_type != carMessage::PATH_REQUEST) {
+        routeRequest request = deserialize_routeRequest(buffer);
+
+        // Onboarding only accepts PATH_REQUEST — reject anything else immediately
+        if (request.type != carMessage::PATH_REQUEST) {
             close(carSocket);
             continue;
         }
 
-        routeRequest request{};
-        if (!recvExact(carSocket, (uint8_t*)&request, sizeof(routeRequest)))
+        // Clear handshake timeout — car identified itself, connection is now live
+        struct timeval no_timeout{ .tv_sec = 0, .tv_usec = 0 };
+        setsockopt(carSocket, SOL_SOCKET, SO_RCVTIMEO, &no_timeout, sizeof(no_timeout));
+
         {
-            close(carSocket);
-            continue;
+            std::lock_guard<std::mutex> lock(car_socket_mutex);
+            carSockets[request.car_id] = carSocket;
         }
 
-        if (request.type != carMessage::PATH_REQUEST)
-        {
-            close(carSocket);
-            continue;
-        }
+        // Push the route request into the traffic handler queue for processing on next tick
+        handler.onRouteRequest(request);
 
+        uint32_t car_id = request.car_id;
 
-        std::lock_guard<std::mutex> lock(car_socket_mutex);
-        carSockets[request.car_id] = carSocket;
-
-        // Spawn a dedicated receive thread for this car
-        // Spawns a new thread to handle incoming data for this car using the receiveLoop member function.
-        std::thread car_thread(&commsHandler::receiveLoop, this, carSocket, request.car_id);
+        std::thread car_thread(&commsHandler::receiveLoop, this, carSocket, car_id);
         car_thread.detach();
     }
 }
@@ -97,8 +115,9 @@ void commsHandler::receiveLoop(int car_socket_fd, uint32_t car_id){
     while (true)
     {
         // Every car message starts with a 1-byte carMessage type
-        carMessage msg_type{};
-        if (!recvExact(car_socket_fd, (uint8_t*)&msg_type, sizeof(carMessage)))
+        // Read it first so we know which struct size to read next
+        uint8_t buffer[sizeof(telemetryPayload)]; // telemetryPayload is the largest incoming struct
+        if (!recvExact(car_socket_fd, buffer, sizeof(carMessage)))
         {
             // Socket closed or error — remove car and exit thread
             std::lock_guard<std::mutex> lock(car_socket_mutex);
@@ -107,26 +126,52 @@ void commsHandler::receiveLoop(int car_socket_fd, uint32_t car_id){
             return;
         }
 
-        // We already consumed the type byte, so read only the remaining fields
+        carMessage msg_type = static_cast<carMessage>(buffer[0]);
+
+        // We already have the type byte in buffer[0]
+        // Read the remaining bytes for this struct directly after it in the same buffer
+        // so the deserializer receives a complete contiguous struct
         switch (msg_type)
         {
             case carMessage::UPDATE_POSITION:
             {
-
+                if (!recvExact(car_socket_fd, buffer + sizeof(carMessage), sizeof(telemetryPayload) - sizeof(carMessage)))
+                {
+                    std::lock_guard<std::mutex> lock(car_socket_mutex);
+                    carSockets.erase(car_id);
+                    close(car_socket_fd);
+                    return;
+                }
+                telemetryPayload payload = deserialize_telemetryPayload(buffer);
+                handler.onTelemetryUpdate(payload);
+                break;
             }
 
             case carMessage::ROUTE_COMPLETE:
             {
-
+                if (!recvExact(car_socket_fd, buffer + sizeof(carMessage), sizeof(routeComplete) - sizeof(carMessage)))
+                {
+                    std::lock_guard<std::mutex> lock(car_socket_mutex);
+                    carSockets.erase(car_id);
+                    close(car_socket_fd);
+                    return;
+                }
+                routeComplete complete = deserialize_routeComplete(buffer);
+                // Route complete is passed to the handler as a telemetry payload
+                // with ROUTE_COMPLETE type — handler checks this in carDone()
+                telemetryPayload done{};
+                done.type   = carMessage::ROUTE_COMPLETE;
+                done.car_id = complete.car_id;
+                handler.onTelemetryUpdate(done);
+                break;
             }
 
             case carMessage::PATH_REQUEST:
             default:
-
-                
+                printf("Unexpected message type %d from car %u\n", (int)msg_type, car_id);
+                break;
         }
     }
-
 }
 
 void commsHandler::sendLoop(){
@@ -162,4 +207,81 @@ bool commsHandler::recvExact(int socket_fd, uint8_t* buffer, size_t num_bytes){
         total += received;
     }
     return true;
+}
+
+// =============================================================
+// DESERIALIZERS
+// Raw bytes to structs — structs are packed so direct cast is safe
+// =============================================================
+
+routeRequest commsHandler::deserialize_routeRequest(const uint8_t* payload) {
+    return *(routeRequest*)payload;
+}
+
+telemetryPayload commsHandler::deserialize_telemetryPayload(const uint8_t* payload) {
+    return *(telemetryPayload*)payload;
+}
+
+routeComplete commsHandler::deserialize_routeComplete(const uint8_t* payload) {
+    return *(routeComplete*)payload;
+}
+
+// =============================================================
+// SERIALIZERS
+// Structs to raw bytes — structs are packed so direct cast is safe
+// =============================================================
+
+void commsHandler::serialize_pathCommand(const path_command& cmd, uint8_t* out_buffer, uint16_t& out_size) {
+    out_size = sizeof(path_command);
+    *(path_command*)out_buffer = cmd;
+}
+
+void commsHandler::serialize_stopCommand(const stop_command& cmd, uint8_t* out_buffer, uint16_t& out_size) {
+    out_size = sizeof(stop_command);
+    *(stop_command*)out_buffer = cmd;
+}
+
+// =============================================================
+// PUBLIC QUEUE INTERFACE — called by tick()
+// =============================================================
+
+void commsHandler::queuePathCommand(const path_command& cmd) {
+    QueuedCommand queued{};
+    queued.car_id = cmd.car_id;
+    serialize_pathCommand(cmd, queued.buffer, queued.size);
+    {
+        std::lock_guard<std::mutex> lock(command_mutex);
+        commandQueue.push(queued);
+    }
+    command_cv.notify_one();
+}
+
+void commsHandler::queueStopCommand(const stop_command& cmd) {
+    QueuedCommand queued{};
+    queued.car_id = cmd.car_id;
+    serialize_stopCommand(cmd, queued.buffer, queued.size);
+    {
+        std::lock_guard<std::mutex> lock(command_mutex);
+        commandQueue.push(queued);
+    }
+    command_cv.notify_one();
+}
+
+void commsHandler::queueStopAll() {
+    // Snapshot connected car IDs before releasing socket mutex
+    // to avoid holding two mutexes simultaneously
+    std::vector<uint32_t> connected_cars;
+    {
+        std::lock_guard<std::mutex> slock(car_socket_mutex);
+        for (auto& [car_id, socket_fd] : carSockets) {
+            connected_cars.push_back(car_id);
+        }
+    }
+
+    for (uint32_t car_id : connected_cars) {
+        stop_command stop{};
+        stop.car_id  = car_id;
+        stop.command = handlerCommand::EMERGENCY_STOP;
+        queueStopCommand(stop);
+    }
 }

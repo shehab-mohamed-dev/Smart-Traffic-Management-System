@@ -5,7 +5,7 @@ import time
 import csv
 import requests
 import threading # <--- NEW IMPORT FOR MULTITHREADING
-from traffic_brain import TrafficBrain
+from CarsSimulation.ignore.traffic_brain import TrafficBrain
 
 # ==========================================
 # 🔴 PASTE YOUR FIREBASE URL HERE 🔴

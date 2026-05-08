@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <thread>
 #include <queue>
+#include <vector>
 #include <mutex>
 #include <unordered_map>
 #include <condition_variable>
@@ -18,7 +19,6 @@ private:
 
     trafficHandler& handler;
 
-    
     //Recieving socket for onboarding requests
     int onBoarding_socket;
     //Chosen port for socket
@@ -40,8 +40,6 @@ private:
     std::queue<QueuedCommand> commandQueue;
     std::mutex                command_mutex;
     std::condition_variable   command_cv;
-
-
 
     // Socket setup
     //Creates listening socket for onboarding requests 
@@ -68,19 +66,18 @@ private:
     // Reads exactly num_bytes from socket, handles partial TCP reads
     bool recvExact(int socket_fd, uint8_t* buffer, size_t num_bytes);
 
-    // Deserializers
-    void deserializeAndDispatch(uint8_t message_type, uint8_t* payload, uint16_t payload_size);
+    // Deserializers — raw bytes to structs
     routeRequest     deserialize_routeRequest(const uint8_t* payload);
     telemetryPayload deserialize_telemetryPayload(const uint8_t* payload);
     routeComplete    deserialize_routeComplete(const uint8_t* payload);
 
-    // Serializers
+    // Serializers — structs to raw bytes
     void serialize_pathCommand(const path_command& cmd, uint8_t* out_buffer, uint16_t& out_size);
     void serialize_stopCommand(const stop_command& cmd, uint8_t* out_buffer, uint16_t& out_size);
 
 public:
 
-    commsHandler(trafficHandler& handler, uint16_t recv_port, uint16_t send_port);
+    commsHandler(trafficHandler& handler, uint16_t port);
 
     // Starts both threads
     void start_coms();
@@ -88,5 +85,5 @@ public:
     // Called by tick() to queue a command for sending
     void queuePathCommand(const path_command& cmd);
     void queueStopCommand(const stop_command& cmd);
+    void queueStopAll();
 };
-

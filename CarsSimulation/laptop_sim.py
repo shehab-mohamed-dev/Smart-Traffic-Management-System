@@ -6,7 +6,7 @@ import json
 import random
 from config import *
 from vehicle import Car
-from intersection_gui import draw_environment
+from CarsSimulation.intersection_gui import draw_environment
 
 def reset_simulation():
     return []

@@ -1,7 +1,8 @@
 #pragma once
-#include "../traffic_handler/spaceTimeGrid.h"
+#include "traffic_handler/spaceTimeGrid.h"
 #include <array>
 #include <string>
+#include <cstdint>
 
 //system limits
 const int MAX_TEMPLATE_BLOCKS = 120;
@@ -80,16 +81,14 @@ struct ActiveCar {
 // PI -> CAR
 
 //Message sent from the traffic handler in the pi to the cars
-struct path_command {
+struct __attribute__((packed)) path_command {
     uint32_t car_id;           // 4 bytes: Which car this is for
-    handlerCommand command;       // 1 byte: What the car should do
+    handlerCommand command;    // 1 byte: What the car should do
     uint8_t num_waypoints;     // 1 byte: How many waypoints in the array are actually valid
-    
-    //The array of waypoints for the car to follow at given speeds
     std::array<Waypoint, MAX_WAYPOINTS> waypoints; // 30 * 12 bytes = 360 bytes
 };
 
-struct stop_command {
+struct __attribute__((packed)) stop_command {
     uint32_t car_id;
     handlerCommand command;
 };
@@ -100,14 +99,14 @@ struct stop_command {
 
 
 // Represents the incoming request before it gets approved
-struct routeRequest {
+struct __attribute__((packed)) routeRequest {
     carMessage type; //1 byte
     uint32_t car_id; //4 bytes
     RouteID requested_route; //1 byte
-}; 
+};  
 
 // Car updating pi about its current position
-struct telemetryPayload {
+struct __attribute__((packed)) telemetryPayload {
     carMessage type; // 1 byte
     uint32_t car_id; // 4 bytes
     float current_x; // 4 bytes 
@@ -116,7 +115,7 @@ struct telemetryPayload {
 };
 
 // Car saying it has reached it destination
-struct routeComplete {
+struct __attribute__((packed)) routeComplete {
     carMessage type; // 1 byte
     uint32_t car_id; // 4 bytes
 };
