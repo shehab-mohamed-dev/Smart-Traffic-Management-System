@@ -5,7 +5,6 @@
 #include "HAL_IR_private.h"
 #include "HAL_IR_interface.h"
 
-#include "../MCAL/MCAL_GPIO/GPIO_interface.h"
 
 void IR_Init(void)
 {

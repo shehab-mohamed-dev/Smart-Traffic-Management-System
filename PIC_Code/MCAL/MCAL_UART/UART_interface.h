@@ -20,6 +20,9 @@ void UART_sendString(const u8* string);
 //Read a byte of data from buffer
 u8 UART_readByte(void);
 
+//Checks if UART is avialable
+bool UART_available();
+
 
 
 #endif

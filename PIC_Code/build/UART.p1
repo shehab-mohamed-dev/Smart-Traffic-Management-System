@@ -25,16 +25,16 @@ Version 4.0 HI-TECH Software Intermediate Code
 "32
 [e :UE 1 ]
 }
-"36
+"34
 [v _UART_sendByte `(v ~T0 @X0 1 ef1`uc ]
-"37
+"35
 {
 [e :U _UART_sendByte ]
-"36
+"34
 [v _data `uc ~T0 @X0 1 r1 ]
-"37
+"35
 [f ]
-"41
+"39
 [e $U 3  ]
 [e :U 4 ]
 {
@@ -42,64 +42,76 @@ Version 4.0 HI-TECH Software Intermediate Code
 [e :U 3 ]
 [e $ ! != & -> >> -> *U -> -> 12 `i `*Vuc `i -> 4 `i `ui -> 1 `ui -> -> 0 `i `ui 4  ]
 [e :U 5 ]
-"43
+"41
 [e = *U -> -> 25 `i `*Vuc _data ]
-"44
+"42
 [e :UE 2 ]
 }
-"47
+"44
 [v _UART_sendString `(v ~T0 @X0 1 ef1`*Cuc ]
-"48
+"45
 {
 [e :U _UART_sendString ]
-"47
+"44
 [v _string `*Cuc ~T0 @X0 1 r1 ]
-"48
+"45
 [f ]
-"50
+"47
 [e $ ! != _string -> -> -> 0 `i `*v `*Cuc 7  ]
+"48
+{
+"50
+[e $U 8  ]
+[e :U 9 ]
 "51
 {
 "53
-[e $U 8  ]
-[e :U 9 ]
-"54
-{
-"56
 [e ( _UART_sendByte (1 *U _string ]
-"59
+"56
 [e ++ _string * -> -> 1 `i `x -> -> # *U _string `i `x ]
-"60
+"57
 }
 [e :U 8 ]
-"53
+"50
 [e $ != -> *U _string `ui -> 0 `ui 9  ]
 [e :U 10 ]
-"61
+"58
 }
 [e :U 7 ]
-"62
+"59
 [e :UE 6 ]
 }
-"65
-[v _UART_readByte `(uc ~T0 @X0 1 ef ]
+"61
+[v _UART_available `(a ~T0 @X0 1 ef ]
+"62
+{
+[e :U _UART_available ]
+[f ]
+"63
+[e ) -> & -> >> -> *U -> -> 12 `i `*Vuc `i -> 5 `i `ui -> 1 `ui `a ]
+[e $UE 11  ]
+"64
+[e :UE 11 ]
+}
 "66
+[v _UART_readByte `(uc ~T0 @X0 1 ef ]
+"67
 {
 [e :U _UART_readByte ]
 [f ]
-"69
-[e $U 12  ]
-[e :U 13 ]
-{
-"71
-}
-[e :U 12 ]
-"69
-[e $ ! != & -> >> -> *U -> -> 12 `i `*Vuc `i -> 5 `i `ui -> 1 `ui -> -> 0 `i `ui 13  ]
+"70
+[e $U 13  ]
 [e :U 14 ]
-"74
-[e ) *U -> -> 26 `i `*Vuc ]
-[e $UE 11  ]
+{
+"72
+}
+[e :U 13 ]
+"70
+[e $ ! != & -> >> -> *U -> -> 12 `i `*Vuc `i -> 5 `i `ui -> 1 `ui -> -> 0 `i `ui 14  ]
+[e :U 15 ]
 "75
-[e :UE 11 ]
+[e ) *U -> -> 26 `i `*Vuc ]
+[e $UE 12  ]
+"76
+[e :UE 12 ]
 }

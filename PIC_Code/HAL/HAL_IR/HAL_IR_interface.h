@@ -2,6 +2,8 @@
 #define HAL_IR_INTERFACE_H_
 
 #include "../SERVICES/STD_TYPES.h"
+#include "../MCAL/MCAL_GPIO/GPIO_interface.h"
+
 
 #define IR1_PIN        GPIO_PIN7
 #define IR2_PIN        GPIO_PIN6

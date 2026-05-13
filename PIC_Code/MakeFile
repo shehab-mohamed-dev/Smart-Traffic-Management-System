@@ -12,17 +12,23 @@ CFLAGS = -mcpu=$(MCU) -Os -mdfp=$(DFP_PATH)
 INCLUDES = -I. \
            -IMCAL/MCAL_GPIO \
            -IMCAL/MCAL_UART \
+           -IMCAL/MCAL_interrupt \
+           -IHAL/HAL_IR \
+           -IHAL/HAL_LCD \
            -ISERVICES 
 
 # --- Explicit Source Files ---
 # EXACTLY what the compiler will look at. 
 # If you add a new driver, you MUST add its .c file here.
-SRCS = APP/main_test_UART.c \
+SRCS = APP/main.c \
        MCAL/MCAL_GPIO/GPIO.c \
+       MCAL/MCAL_interrupt/interrupt.c \
        MCAL/MCAL_UART/UART.c \
+       HAL/HAL_IR/HAL_IR.c \
+       HAL/HAL_LCD/HAL_LCD.c 
 
 # --- Output Name ---
-TARGET = build/testUART.hex
+TARGET = build/test.hex
 
 all: build $(TARGET)
 

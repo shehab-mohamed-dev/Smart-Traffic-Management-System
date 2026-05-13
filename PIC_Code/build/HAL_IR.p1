@@ -1,0 +1,54 @@
+Version 4.0 HI-TECH Software Intermediate Code
+"31 SERVICES/../MCAL/MCAL_GPIO/GPIO_interface.h
+[v _GPIO_SetPinDirection `(v ~T0 @X0 0 ef3`uc`uc`uc ]
+"33
+[v _GPIO_GetPinValue `(uc ~T0 @X0 0 ef2`uc`uc ]
+"9 HAL/HAL_IR/HAL_IR.c
+[v _IR_Init `(v ~T0 @X0 1 ef ]
+"10
+{
+[e :U _IR_Init ]
+[f ]
+"12
+[e ( _GPIO_SetPinDirection (3 , , -> -> 1 `i `uc -> -> 7 `i `uc -> -> 1 `i `uc ]
+"13
+[e ( _GPIO_SetPinDirection (3 , , -> -> 1 `i `uc -> -> 6 `i `uc -> -> 1 `i `uc ]
+"14
+[e ( _GPIO_SetPinDirection (3 , , -> -> 1 `i `uc -> -> 5 `i `uc -> -> 1 `i `uc ]
+"15
+[e ( _GPIO_SetPinDirection (3 , , -> -> 1 `i `uc -> -> 4 `i `uc -> -> 1 `i `uc ]
+"16
+[e :UE 1 ]
+}
+"18
+[v _IR_ReadState `(a ~T0 @X0 1 ef1`uc ]
+"19
+{
+[e :U _IR_ReadState ]
+"18
+[v _sensorPin `uc ~T0 @X0 1 r1 ]
+"19
+[f ]
+"21
+[e $ ! ! != -> ( _GPIO_GetPinValue (2 , -> -> 1 `i `uc _sensorPin `i -> 0 `i 3  ]
+"22
+{
+"24
+[e ) -> -> 1 `i `a ]
+[e $UE 2  ]
+"25
+}
+[e $U 4  ]
+"26
+[e :U 3 ]
+"27
+{
+"29
+[e ) -> -> 0 `i `a ]
+[e $UE 2  ]
+"30
+}
+[e :U 4 ]
+"32
+[e :UE 2 ]
+}

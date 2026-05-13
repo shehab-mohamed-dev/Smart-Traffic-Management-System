@@ -31,8 +31,6 @@ void UART_init(void) {
     SET_BIT(RCSTA, CREN);  
 }
 
-
-
 void UART_sendByte(u8 data)
 {
 
@@ -42,7 +40,6 @@ void UART_sendByte(u8 data)
     
     TXREG = data;
 }
-
 
 void UART_sendString(const u8* string)
 {
@@ -61,6 +58,10 @@ void UART_sendString(const u8* string)
     }
 }
 
+bool UART_available(void)
+{
+    return GET_BIT(PIR1, RCIF);
+}
 
 u8 UART_readByte(void)
 {
