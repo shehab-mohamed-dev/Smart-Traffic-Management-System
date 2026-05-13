@@ -9,8 +9,8 @@
 	;
 	; -q --opt=none --chip=16f877a --opt=+s \
 	; --dfp=C:/Users/Ziad/Desktop/Academic/College zewail city/Courses/CIE/Year 4/CIE 408 Embedded Systems/Compiler/Microchip.PIC16Fxxx_DFP.1.7.162/xc8 \
-	; -I. -IMCAL/MCAL_GPIO -IHAL/HAL_LCD -ISERVICES APP/main_test_LCD.c \
-	; MCAL/MCAL_GPIO/GPIO.c HAL/HAL_LCD/HAL_LCD.c -otestLCD.hex \
+	; -I. -IMCAL/MCAL_GPIO -IMCAL/MCAL_UART -ISERVICES APP/main_test_UART.c \
+	; MCAL/MCAL_GPIO/GPIO.c MCAL/MCAL_UART/UART.c -otestUART.hex \
 	; --objdir=build --outdir=build -L--fixupoverflow=error --std=c99 \
 	; --rors --icl=auto --callgraph=none --warn=-3 \
 	; --errformat=%f:%l:%c: error: (%n) %s \

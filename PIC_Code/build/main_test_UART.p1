@@ -1,0 +1,53 @@
+Version 4.0 HI-TECH Software Intermediate Code
+"34 APP/../MCAL/MCAL_GPIO/GPIO_interface.h
+[v _GPIO_Init `(v ~T0 @X0 0 ef ]
+"11 APP/../MCAL/MCAL_UART/UART_interface.h
+[v _UART_init `(v ~T0 @X0 0 ef ]
+"18
+[v _UART_sendString `(v ~T0 @X0 0 ef1`*Cuc ]
+[p mainexit ]
+"21
+[v _UART_readByte `(uc ~T0 @X0 0 ef ]
+"15
+[v _UART_sendByte `(v ~T0 @X0 0 ef1`uc ]
+"6 APP/main_test_UART.c
+[v _setup `(v ~T0 @X0 1 ef ]
+"7
+{
+[e :U _setup ]
+[f ]
+"8
+[e ( _GPIO_Init ..  ]
+"9
+[e ( _UART_init ..  ]
+"10
+[e ( _UART_sendString (1 -> -> :s 1C `*uc `*Cuc ]
+"11
+[e :UE 1 ]
+}
+[v $root$_main `(v ~T0 @X0 0 e ]
+"12
+[v _main `(i ~T0 @X0 1 ef ]
+"13
+{
+[e :U _main ]
+[f ]
+"14
+[e ( _setup ..  ]
+"15
+[e :U 4 ]
+{
+"16
+[v _received_char `uc ~T0 @X0 1 a ]
+[e = _received_char ( _UART_readByte ..  ]
+"17
+[e ( _UART_sendByte (1 _received_char ]
+"18
+}
+[e :U 3 ]
+[e $U 4  ]
+[e :U 5 ]
+"19
+[e :UE 2 ]
+}
+[a 1C 85 65 82 84 32 87 111 114 107 105 110 103 33 10 0 ]
