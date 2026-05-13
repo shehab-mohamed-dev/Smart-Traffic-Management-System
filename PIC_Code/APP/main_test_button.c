@@ -1,6 +1,4 @@
-#include "../HAL/HAL_IR/HAL_IR_interface.h"
 #include "../HAL/HAL_LED/HAL_LED_interface.h"
-
 #include "../MCAL/MCAL_interrupt/interrupt_interface.h"
 #include "../MCAL/MCAL_GPIO/GPIO_interface.h"
 

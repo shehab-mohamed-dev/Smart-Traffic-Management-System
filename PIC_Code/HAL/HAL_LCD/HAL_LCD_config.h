@@ -1,14 +1,13 @@
-#ifndef LCD_CONFIG_H
-#define LCD_CONFIG_H
-#include "../SERVICES/STD_TYPES.h"
-#include "../MCAL/MCAL_GPIO/GPIO_interface.h"
+#ifndef HAL_LCD_CONFIG
+#define HAL_LCD_CONFIG
 
+#define _XTAL_FREQ 8000000
 
-#define LCD_CNTRL_PORT GPIO_PORTE
+#define LCD_DATA_PORT   GPIO_PORTD
 
-#define RS_PIN GPIO_PIN0
-#define E_PIN GPIO_PIN1
+#define LCD_CNTRL_PORT  GPIO_PORTB
+#define RS_PIN          GPIO_PIN1
+#define E_PIN           GPIO_PIN2
 
-#define LCD_DATA_PORT GPIO_PORTD
 
 #endif

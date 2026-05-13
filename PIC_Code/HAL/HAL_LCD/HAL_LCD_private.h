@@ -1,11 +1,5 @@
-#ifndef LCD_PRIVATE_H
-#define LCD_PRIVATE_H
+#ifndef HAL_LCD_PRIVATE_H_
+#define HAL_LCD_PRIVATE_H_
 
 
-
-//Commands for LCD
-#define CLR_SCREEN 0x01
-#define Four_bitMode 0x28
-#define Eight_bitMode 0x38
-
-#endif
+#endif 

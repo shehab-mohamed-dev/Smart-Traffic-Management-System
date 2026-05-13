@@ -1,7 +1,8 @@
 #ifndef LED_INTERFACE_H
 #define LED_INTERFACE_H
+#include "../SERVICES/STD_TYPES.h"
 
-/* LED States */
+
 #define LED_OFF    0
 #define LED_ON     1
 

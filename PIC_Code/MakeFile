@@ -11,29 +11,24 @@ CFLAGS = -mcpu=$(MCU) -Os -mdfp=$(DFP_PATH)
 # but it does NOT compile anything automatically.
 INCLUDES = -I. \
            -IMCAL/MCAL_GPIO \
-           -IMCAL/MCAL_interrupt \
-           -IHAL/HAL_LED \
+           -IHAL/HAL_LCD \
            -ISERVICES 
 
 # --- Explicit Source Files ---
 # EXACTLY what the compiler will look at. 
 # If you add a new driver, you MUST add its .c file here.
-SRCS = APP/main_test_button.c \
+SRCS = APP/main_test_LCD.c \
        MCAL/MCAL_GPIO/GPIO.c \
-       MCAL/MCAL_interrupt/interrupt.c \
-       HAL/HAL_LED/HAL_LED.c
+       HAL/HAL_LCD/HAL_LCD.c \
 
 # --- Output Name ---
-TARGET = build/testPedestrian.hex
+TARGET = build/testLCD.hex
 
 all: build $(TARGET)
 
 # --- Compilation and Linking Stage ---
 $(TARGET): $(SRCS) 
 	$(CC) $(CFLAGS) $(INCLUDES) $(SRCS) -o $(TARGET)
-
-
-build:
 
 
 clean:
