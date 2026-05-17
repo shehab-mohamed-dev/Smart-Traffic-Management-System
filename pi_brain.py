@@ -16,7 +16,7 @@ FIREBASE_URL = "https://smarttraffic-cps-default-rtdb.firebaseio.com/live_stats.
 def push_to_firebase_background(data):
     try:
         requests.put(FIREBASE_URL, json=data, timeout=2)
-        # print("☁️ Successfully pushed to Firebase!") # Optional: comment out if it clutters the terminal
+        print("☁️ Successfully pushed to Firebase!") # Optional: comment out if it clutters the terminal
     except Exception as e:
         print(f"⚠️ Could not connect to Firebase: {e}")
 
