@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "gpio_interface.h": "c",
+        "interrupt_interface.h": "c",
+        "bit_math.h": "c"
+    }
+}

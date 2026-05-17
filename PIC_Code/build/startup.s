@@ -9,13 +9,13 @@
 	;
 	; -q --opt=none --chip=16f877a --opt=+s \
 	; --dfp=C:/Users/Ziad/Desktop/Academic/College zewail city/Courses/CIE/Year 4/CIE 408 Embedded Systems/Compiler/Microchip.PIC16Fxxx_DFP.1.7.162/xc8 \
-	; -I. -IMCAL/MCAL_GPIO -IMCAL/MCAL_UART -IMCAL/MCAL_interrupt \
-	; -IHAL/HAL_IR -IHAL/HAL_LCD -ISERVICES APP/main.c \
+	; -I. -IMCAL/MCAL_GPIO -IMCAL/MCAL_interrupt -IMCAL/MCAL_UART \
+	; -IHAL/HAL_LED -IHAL/HAL_IR -ISERVICES APP/main_hardware_UART.c \
 	; MCAL/MCAL_GPIO/GPIO.c MCAL/MCAL_interrupt/interrupt.c \
-	; MCAL/MCAL_UART/UART.c HAL/HAL_IR/HAL_IR.c HAL/HAL_LCD/HAL_LCD.c \
-	; -otest.hex --objdir=build --outdir=build -L--fixupoverflow=error \
-	; --std=c99 --rors --icl=auto --callgraph=none --warn=-3 \
-	; --errformat=%f:%l:%c: error: (%n) %s \
+	; MCAL/MCAL_UART/UART.c HAL/HAL_LED/HAL_LED.c HAL/HAL_IR/HAL_IR.c \
+	; -otest_Hardware_UART.hex --objdir=build --outdir=build \
+	; -L--fixupoverflow=error --std=c99 --rors --icl=auto --callgraph=none \
+	; --warn=-3 --errformat=%f:%l:%c: error: (%n) %s \
 	; --warnformat=%f:%l:%c: warning: (%n) %s \
 	; --msgformat=%f:%l:%c: advisory: (%n) %s
 	;

@@ -334,37 +334,32 @@ EECON1 equ 018Ch ;#
 # 2361 "C:/Users/Ziad/Desktop/Academic/College zewail city/Courses/CIE/Year 4/CIE 408 Embedded Systems/Compiler/Microchip.PIC16Fxxx_DFP.1.7.162/xc8\pic\include\proc/pic16f877a.h"
 EECON2 equ 018Dh ;# 
 	debug_source C
-	FNCALL	_main,_LCD_sendData
+	FNCALL	_main,_LED_Toggle
 	FNCALL	_main,_UART_available
 	FNCALL	_main,_UART_readByte
 	FNCALL	_main,_UART_sendByte
 	FNCALL	_main,_setup
 	FNCALL	_setup,_EXT_INT_SetCallback
+	FNCALL	_setup,_GPIO_SetPinDirection
 	FNCALL	_setup,_IOC_Enable
 	FNCALL	_setup,_IOC_SetCallback
 	FNCALL	_setup,_IR_Init
-	FNCALL	_setup,_LCD_init
+	FNCALL	_setup,_LED_Init
 	FNCALL	_setup,_UART_init
+	FNCALL	_setup,_interrupt_EXT_edge
 	FNCALL	_setup,_interrupt_EXT_enable
 	FNCALL	_setup,_interrupt_globalEnable
+	FNCALL	_setup,_interrupt_peripheralEnable
 	FNCALL	_UART_init,_GPIO_SetPinDirection
-	FNCALL	_LCD_init,_GPIO_SetPinDirection
-	FNCALL	_LCD_init,_LCD_sendCommand
-	FNCALL	_LCD_sendCommand,_GPIO_SetPinValue
-	FNCALL	_LCD_sendCommand,_LCD_enablePulse
-	FNCALL	_LCD_sendCommand,_LCD_setMode_command
-	FNCALL	_LCD_setMode_command,_GPIO_SetPinValue
+	FNCALL	_LED_Init,_GPIO_SetPinDirection
 	FNCALL	_IR_Init,_GPIO_SetPinDirection
-	FNCALL	_LCD_sendData,_GPIO_SetPinValue
-	FNCALL	_LCD_sendData,_LCD_enablePulse
-	FNCALL	_LCD_sendData,_LCD_setMode_data
-	FNCALL	_LCD_setMode_data,_GPIO_SetPinValue
-	FNCALL	_LCD_enablePulse,_GPIO_SetPinValue
+	FNCALL	_LED_Toggle,_GPIO_GetPinValue
+	FNCALL	_LED_Toggle,_GPIO_SetPinValue
 	FNROOT	_main
 	FNCALL	_ISR,_objectDetected_IR_ISR
 	FNCALL	_ISR,_pedestrian_buttons_ISR
 	FNCALL	_objectDetected_IR_ISR,_IR_ReadState
-	FNCALL	_IR_ReadState,_GPIO_GetPinValue
+	FNCALL	_IR_ReadState,i1_GPIO_GetPinValue
 	FNCALL	intlevel1,_ISR
 	global	intlevel1
 	FNROOT	intlevel1
@@ -378,7 +373,7 @@ EECON2 equ 018Dh ;#
 	config ignore_cmsgs    = off
 	config default_configs = off
 	config default_idlocs  = off
-	file	"build\test.s"
+	file	"build\test_friday.s"
 	line	#
 psect cinit,class=CODE,delta=2
 global start_initialization
@@ -401,7 +396,7 @@ _pedestrianPressed:
 _objectDetected:
        ds      1
 
-	file	"build\test.s"
+	file	"build\test_friday.s"
 	line	#
 ; Clear objects allocated to BANK0
 psect cinit,class=CODE,delta=2,merge=1
@@ -425,36 +420,32 @@ global __pcstackCOMMON
 __pcstackCOMMON:
 ?_IR_ReadState:	; 1 bytes @ 0x0
 ?_IR_Init:	; 1 bytes @ 0x0
-?_LCD_init:	; 1 bytes @ 0x0
-?_UART_init:	; 1 bytes @ 0x0
+?_interrupt_EXT_edge:	; 1 bytes @ 0x0
 ?_interrupt_EXT_enable:	; 1 bytes @ 0x0
 ?_IOC_Enable:	; 1 bytes @ 0x0
 ?_interrupt_globalEnable:	; 1 bytes @ 0x0
+?_interrupt_peripheralEnable:	; 1 bytes @ 0x0
+?_UART_init:	; 1 bytes @ 0x0
 ?_UART_sendByte:	; 1 bytes @ 0x0
 ?_UART_available:	; 1 bytes @ 0x0
 ?_UART_readByte:	; 1 bytes @ 0x0
-?_LCD_sendData:	; 1 bytes @ 0x0
-?_LCD_sendCommand:	; 1 bytes @ 0x0
 ?_pedestrian_buttons_ISR:	; 1 bytes @ 0x0
 ?_objectDetected_IR_ISR:	; 1 bytes @ 0x0
 ?_setup:	; 1 bytes @ 0x0
-?_GPIO_GetPinValue:	; 1 bytes @ 0x0
 ?_ISR:	; 1 bytes @ 0x0
-?_LCD_enablePulse:	; 1 bytes @ 0x0
-?_LCD_setMode_data:	; 1 bytes @ 0x0
-?_LCD_setMode_command:	; 1 bytes @ 0x0
+?i1_GPIO_GetPinValue:	; 1 bytes @ 0x0
 ?_main:	; 2 bytes @ 0x0
-	global	GPIO_GetPinValue@Pin
-GPIO_GetPinValue@Pin:	; 1 bytes @ 0x0
+	global	i1GPIO_GetPinValue@Pin
+i1GPIO_GetPinValue@Pin:	; 1 bytes @ 0x0
 ??_pedestrian_buttons_ISR:	; 1 bytes @ 0x0
 	ds	1
-??_GPIO_GetPinValue:	; 1 bytes @ 0x1
+??i1_GPIO_GetPinValue:	; 1 bytes @ 0x1
 	ds	1
-	global	GPIO_GetPinValue@Port
-GPIO_GetPinValue@Port:	; 1 bytes @ 0x2
+	global	i1GPIO_GetPinValue@Port
+i1GPIO_GetPinValue@Port:	; 1 bytes @ 0x2
 	ds	1
-	global	GPIO_GetPinValue@Local_Value
-GPIO_GetPinValue@Local_Value:	; 1 bytes @ 0x3
+	global	i1GPIO_GetPinValue@Local_Value
+i1GPIO_GetPinValue@Local_Value:	; 1 bytes @ 0x3
 	ds	1
 	global	IR_ReadState@sensorPin
 IR_ReadState@sensorPin:	; 1 bytes @ 0x4
@@ -478,21 +469,28 @@ objectDetected_IR_ISR@pin4:	; 1 bytes @ 0x8
 psect	cstackBANK0,class=BANK0,space=1,noexec
 global __pcstackBANK0
 __pcstackBANK0:
+?_GPIO_SetPinDirection:	; 1 bytes @ 0x0
 ?_EXT_INT_SetCallback:	; 1 bytes @ 0x0
 ?_IOC_SetCallback:	; 1 bytes @ 0x0
-?_GPIO_SetPinDirection:	; 1 bytes @ 0x0
 ?_GPIO_SetPinValue:	; 1 bytes @ 0x0
+?_GPIO_GetPinValue:	; 1 bytes @ 0x0
 	global	GPIO_SetPinDirection@Pin
 GPIO_SetPinDirection@Pin:	; 1 bytes @ 0x0
 	global	GPIO_SetPinValue@Pin
 GPIO_SetPinValue@Pin:	; 1 bytes @ 0x0
+	global	GPIO_GetPinValue@Pin
+GPIO_GetPinValue@Pin:	; 1 bytes @ 0x0
+	global	interrupt_EXT_edge@edge
+interrupt_EXT_edge@edge:	; 1 bytes @ 0x0
 	global	EXT_INT_SetCallback@ptr
 EXT_INT_SetCallback@ptr:	; 1 bytes @ 0x0
 	global	IOC_SetCallback@ptr
 IOC_SetCallback@ptr:	; 1 bytes @ 0x0
+??_interrupt_EXT_edge:	; 1 bytes @ 0x0
 ??_interrupt_EXT_enable:	; 1 bytes @ 0x0
 ??_IOC_Enable:	; 1 bytes @ 0x0
 ??_interrupt_globalEnable:	; 1 bytes @ 0x0
+??_interrupt_peripheralEnable:	; 1 bytes @ 0x0
 ??_UART_sendByte:	; 1 bytes @ 0x0
 ??_UART_available:	; 1 bytes @ 0x0
 ??_UART_readByte:	; 1 bytes @ 0x0
@@ -505,7 +503,10 @@ GPIO_SetPinValue@Value:	; 1 bytes @ 0x1
 UART_sendByte@data:	; 1 bytes @ 0x1
 ??_EXT_INT_SetCallback:	; 1 bytes @ 0x1
 ??_IOC_SetCallback:	; 1 bytes @ 0x1
+??_GPIO_GetPinValue:	; 1 bytes @ 0x1
 	ds	1
+	global	GPIO_GetPinValue@Port
+GPIO_GetPinValue@Port:	; 1 bytes @ 0x2
 ??_GPIO_SetPinDirection:	; 1 bytes @ 0x2
 ??_GPIO_SetPinValue:	; 1 bytes @ 0x2
 	ds	1
@@ -513,27 +514,33 @@ UART_sendByte@data:	; 1 bytes @ 0x1
 GPIO_SetPinDirection@Port:	; 1 bytes @ 0x3
 	global	GPIO_SetPinValue@Port
 GPIO_SetPinValue@Port:	; 1 bytes @ 0x3
+	global	GPIO_GetPinValue@Local_Value
+GPIO_GetPinValue@Local_Value:	; 1 bytes @ 0x3
 	ds	1
+?_LED_Init:	; 1 bytes @ 0x4
+?_LED_Toggle:	; 1 bytes @ 0x4
+	global	LED_Init@Pin
+LED_Init@Pin:	; 1 bytes @ 0x4
+	global	LED_Toggle@Pin
+LED_Toggle@Pin:	; 1 bytes @ 0x4
 ??_IR_Init:	; 1 bytes @ 0x4
 ??_UART_init:	; 1 bytes @ 0x4
-??_LCD_enablePulse:	; 1 bytes @ 0x4
-??_LCD_setMode_data:	; 1 bytes @ 0x4
-??_LCD_setMode_command:	; 1 bytes @ 0x4
-	ds	2
-??_LCD_sendData:	; 1 bytes @ 0x6
-??_LCD_sendCommand:	; 1 bytes @ 0x6
 	ds	1
-	global	LCD_sendData@data
-LCD_sendData@data:	; 1 bytes @ 0x7
-	global	LCD_sendCommand@command
-LCD_sendCommand@command:	; 1 bytes @ 0x7
+	global	LED_Init@Port
+LED_Init@Port:	; 1 bytes @ 0x5
+	global	LED_Toggle@current
+LED_Toggle@current:	; 1 bytes @ 0x5
+??_LED_Init:	; 1 bytes @ 0x5
+??_LED_Toggle:	; 1 bytes @ 0x5
 	ds	1
-??_LCD_init:	; 1 bytes @ 0x8
-	ds	2
+	global	LED_Toggle@Port
+LED_Toggle@Port:	; 1 bytes @ 0x6
+??_setup:	; 1 bytes @ 0x6
+	ds	1
+??_main:	; 1 bytes @ 0x7
+	ds	3
 	global	main@piCommand
 main@piCommand:	; 1 bytes @ 0xA
-??_setup:	; 1 bytes @ 0xA
-??_main:	; 1 bytes @ 0xA
 	ds	1
 ;!
 ;!Data Sizes:
@@ -578,19 +585,17 @@ main@piCommand:	; 1 bytes @ 0xA
 ;!
 ;!    _ISR->_objectDetected_IR_ISR
 ;!    _objectDetected_IR_ISR->_IR_ReadState
-;!    _IR_ReadState->_GPIO_GetPinValue
+;!    _IR_ReadState->i1_GPIO_GetPinValue
 ;!
 ;!Critical Paths under _main in BANK0
 ;!
-;!    _setup->_LCD_init
+;!    _main->_LED_Toggle
+;!    _setup->_LED_Init
 ;!    _UART_init->_GPIO_SetPinDirection
-;!    _LCD_init->_LCD_sendCommand
-;!    _LCD_sendCommand->_LCD_enablePulse
-;!    _LCD_setMode_command->_GPIO_SetPinValue
+;!    _LED_Init->_GPIO_SetPinDirection
 ;!    _IR_Init->_GPIO_SetPinDirection
-;!    _LCD_sendData->_LCD_enablePulse
-;!    _LCD_setMode_data->_GPIO_SetPinValue
-;!    _LCD_enablePulse->_GPIO_SetPinValue
+;!    _LED_Toggle->_GPIO_GetPinValue
+;!    _LED_Toggle->_GPIO_SetPinValue
 ;!
 ;!Critical Paths under _ISR in BANK0
 ;!
@@ -621,7 +626,7 @@ main@piCommand:	; 1 bytes @ 0xA
 ;!    None.
 
 ;;
-;;Main: autosize = 0, tempsize = 0, incstack = 0, save=0
+;;Main: autosize = 0, tempsize = 3, incstack = 0, save=0
 ;;
 
 ;!
@@ -630,49 +635,47 @@ main@piCommand:	; 1 bytes @ 0xA
 ;! ---------------------------------------------------------------------------------
 ;! (Depth) Function   	        Calls       Base Space   Used Autos Params    Refs
 ;! ---------------------------------------------------------------------------------
-;! (0) _main                                                 1     1      0    6285
-;!                                             10 BANK0      1     1      0
-;!                       _LCD_sendData
+;! (0) _main                                                 4     4      0    2461
+;!                                              7 BANK0      4     4      0
+;!                         _LED_Toggle
 ;!                     _UART_available
 ;!                      _UART_readByte
 ;!                      _UART_sendByte
 ;!                              _setup
 ;! ---------------------------------------------------------------------------------
-;! (1) _setup                                                0     0      0    3748
+;! (1) _setup                                                0     0      0    1672
 ;!                _EXT_INT_SetCallback
+;!               _GPIO_SetPinDirection
 ;!                         _IOC_Enable
 ;!                    _IOC_SetCallback
 ;!                            _IR_Init
-;!                           _LCD_init
+;!                           _LED_Init
 ;!                          _UART_init
+;!                 _interrupt_EXT_edge
 ;!               _interrupt_EXT_enable
 ;!             _interrupt_globalEnable
+;!         _interrupt_peripheralEnable
+;! ---------------------------------------------------------------------------------
+;! (2) _interrupt_peripheralEnable                           0     0      0       0
 ;! ---------------------------------------------------------------------------------
 ;! (2) _interrupt_globalEnable                               0     0      0       0
 ;! ---------------------------------------------------------------------------------
 ;! (2) _interrupt_EXT_enable                                 0     0      0       0
 ;! ---------------------------------------------------------------------------------
-;! (2) _UART_init                                            0     0      0     391
+;! (2) _interrupt_EXT_edge                                   1     1      0      29
+;!                                              0 BANK0      1     1      0
+;! ---------------------------------------------------------------------------------
+;! (2) _UART_init                                            0     0      0     375
 ;!               _GPIO_SetPinDirection
 ;! ---------------------------------------------------------------------------------
-;! (2) _LCD_init                                             2     2      0    2876
-;!                                              8 BANK0      2     2      0
-;!               _GPIO_SetPinDirection
-;!                    _LCD_sendCommand
-;! ---------------------------------------------------------------------------------
-;! (3) _LCD_sendCommand                                      2     2      0    2485
-;!                                              6 BANK0      2     2      0
-;!                   _GPIO_SetPinValue
-;!                    _LCD_enablePulse
-;!                _LCD_setMode_command
-;! ---------------------------------------------------------------------------------
-;! (4) _LCD_setMode_command                                  0     0      0     751
-;!                   _GPIO_SetPinValue
-;! ---------------------------------------------------------------------------------
-;! (2) _IR_Init                                              0     0      0     391
+;! (2) _LED_Init                                             2     1      1     428
+;!                                              4 BANK0      2     1      1
 ;!               _GPIO_SetPinDirection
 ;! ---------------------------------------------------------------------------------
-;! (3) _GPIO_SetPinDirection                                 4     2      2     391
+;! (2) _IR_Init                                              0     0      0     375
+;!               _GPIO_SetPinDirection
+;! ---------------------------------------------------------------------------------
+;! (3) _GPIO_SetPinDirection                                 4     2      2     375
 ;!                                              0 BANK0      4     2      2
 ;! ---------------------------------------------------------------------------------
 ;! (2) _IOC_SetCallback                                      1     0      1      45
@@ -692,85 +695,75 @@ main@piCommand:	; 1 bytes @ 0xA
 ;! (1) _UART_available                                       1     1      0       0
 ;!                                              0 BANK0      1     1      0
 ;! ---------------------------------------------------------------------------------
-;! (1) _LCD_sendData                                         2     2      0    2485
-;!                                              6 BANK0      2     2      0
-;!                   _GPIO_SetPinValue
-;!                    _LCD_enablePulse
-;!                   _LCD_setMode_data
-;! ---------------------------------------------------------------------------------
-;! (2) _LCD_setMode_data                                     0     0      0     751
+;! (1) _LED_Toggle                                           3     2      1     715
+;!                                              4 BANK0      3     2      1
+;!                   _GPIO_GetPinValue
 ;!                   _GPIO_SetPinValue
 ;! ---------------------------------------------------------------------------------
-;! (4) _LCD_enablePulse                                      2     2      0     751
-;!                                              4 BANK0      2     2      0
-;!                   _GPIO_SetPinValue
-;! ---------------------------------------------------------------------------------
-;! (5) _GPIO_SetPinValue                                     4     2      2     751
+;! (2) _GPIO_SetPinValue                                     4     2      2     363
 ;!                                              0 BANK0      4     2      2
 ;! ---------------------------------------------------------------------------------
-;! Estimated maximum stack depth 5
+;! (2) _GPIO_GetPinValue                                     4     3      1     173
+;!                                              0 BANK0      4     3      1
+;! ---------------------------------------------------------------------------------
+;! Estimated maximum stack depth 3
 ;! ---------------------------------------------------------------------------------
 ;! (Depth) Function   	        Calls       Base Space   Used Autos Params    Refs
 ;! ---------------------------------------------------------------------------------
-;! (6) _ISR                                                  5     5      0     294
+;! (4) _ISR                                                  5     5      0     294
 ;!                                              9 COMMON     5     5      0
 ;!                                NULL *
 ;!              _objectDetected_IR_ISR *
 ;!             _pedestrian_buttons_ISR *
 ;! ---------------------------------------------------------------------------------
-;! (7) _pedestrian_buttons_ISR                               0     0      0       0
+;! (5) _pedestrian_buttons_ISR                               0     0      0       0
 ;! ---------------------------------------------------------------------------------
-;! (7) _objectDetected_IR_ISR                                4     4      0     294
+;! (5) _objectDetected_IR_ISR                                4     4      0     294
 ;!                                              5 COMMON     4     4      0
 ;!                       _IR_ReadState
 ;! ---------------------------------------------------------------------------------
-;! (8) _IR_ReadState                                         1     1      0     202
+;! (6) _IR_ReadState                                         1     1      0     202
 ;!                                              4 COMMON     1     1      0
-;!                   _GPIO_GetPinValue
+;!                 i1_GPIO_GetPinValue
 ;! ---------------------------------------------------------------------------------
-;! (9) _GPIO_GetPinValue                                     4     3      1     173
+;! (7) i1_GPIO_GetPinValue                                   4     3      1     173
 ;!                                              0 COMMON     4     3      1
 ;! ---------------------------------------------------------------------------------
-;! (7) NULL(Fake)                                            0     0      0       0
+;! (5) NULL(Fake)                                            0     0      0       0
 ;! ---------------------------------------------------------------------------------
-;! Estimated maximum stack depth 9
+;! Estimated maximum stack depth 7
 ;! ---------------------------------------------------------------------------------
 ;!
 ;! Call Graph Graphs:
 ;!
 ;! _main (ROOT)
-;!   _LCD_sendData
+;!   _LED_Toggle
+;!     _GPIO_GetPinValue
 ;!     _GPIO_SetPinValue
-;!     _LCD_enablePulse
-;!       _GPIO_SetPinValue
-;!     _LCD_setMode_data
-;!       _GPIO_SetPinValue
 ;!   _UART_available
 ;!   _UART_readByte
 ;!   _UART_sendByte
 ;!   _setup
 ;!     _EXT_INT_SetCallback
+;!     _GPIO_SetPinDirection
 ;!     _IOC_Enable
 ;!     _IOC_SetCallback
 ;!     _IR_Init
 ;!       _GPIO_SetPinDirection
-;!     _LCD_init
+;!     _LED_Init
 ;!       _GPIO_SetPinDirection
-;!       _LCD_sendCommand
-;!         _GPIO_SetPinValue
-;!         _LCD_enablePulse
-;!         _LCD_setMode_command
-;!           _GPIO_SetPinValue
 ;!     _UART_init
 ;!       _GPIO_SetPinDirection
+;!     _interrupt_EXT_edge
 ;!     _interrupt_EXT_enable
 ;!     _interrupt_globalEnable
+;!     _interrupt_peripheralEnable
 ;!
 ;! _ISR (ROOT)
 ;!   NULL(Fake) *
 ;!   _objectDetected_IR_ISR *
 ;!     _IR_ReadState
-;!       _GPIO_GetPinValue
+;!       i1_GPIO_GetPinValue
 ;!   _pedestrian_buttons_ISR *
 ;!
 
@@ -794,28 +787,28 @@ main@piCommand:	; 1 bytes @ 0xA
 
 ;; *************** function _main *****************
 ;; Defined at:
-;;		line 66 in file "APP/main.c"
+;;		line 83 in file "APP/main_hardware_UART.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
 ;;  piCommand       1   10[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
-;;                  2   46[None  ] int 
+;;                  2   54[None  ] int 
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, pclath, cstack
 ;; Tracked objects:
 ;;		On entry : B00/0
-;;		On exit  : 0/0
+;;		On exit  : 300/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
 ;;      Locals:         0       1       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       1       0       0       0
-;;Total ram usage:        1 bytes
-;; Hardware stack levels required when called: 9
+;;      Temps:          0       3       0       0       0
+;;      Totals:         0       4       0       0       0
+;;Total ram usage:        4 bytes
+;; Hardware stack levels required when called: 7
 ;; This function calls:
-;;		_LCD_sendData
+;;		_LED_Toggle
 ;;		_UART_available
 ;;		_UART_readByte
 ;;		_UART_sendByte
@@ -825,89 +818,169 @@ main@piCommand:	; 1 bytes @ 0xA
 ;; This function uses a non-reentrant model
 ;;
 psect	maintext,global,class=CODE,delta=2,split=1,group=0
-	file	"APP/main.c"
-	line	66
+	file	"APP/main_hardware_UART.c"
+	line	83
 global __pmaintext
 __pmaintext:	;psect for function _main
 psect	maintext
-	file	"APP/main.c"
-	line	66
+	file	"APP/main_hardware_UART.c"
+	line	83
 	
 _main:	
 ;incstack = 0
-;; hardware stack exceeded
-	callstack 0
+	callstack 1
 ; Regs used in _main: [wreg-fsr0h+status,2+status,0+pclath+cstack]
-	line	68
+	line	85
 	
-l1219:	
+l1262:	
 	fcall	_setup
-	line	74
-	
-l1221:	
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-		decf	((_pedestrianPressed)),w	;volatile
-	btfss	status,2
-	goto	u1271
-	goto	u1270
-u1271:
-	goto	l1227
-u1270:
-	line	77
-	
-l1223:	
-	movlw	low(050h)
-	fcall	_UART_sendByte
-	line	80
-	
-l1225:	
-	clrf	(_pedestrianPressed)	;volatile
-	line	84
-	
-l1227:	
-		decf	((_objectDetected)),w	;volatile
-	btfss	status,2
-	goto	u1281
-	goto	u1280
-u1281:
-	goto	l1233
-u1280:
-	line	87
-	
-l1229:	
-	movlw	low(049h)
-	fcall	_UART_sendByte
-	line	88
-	
-l1231:	
-	clrf	(_objectDetected)	;volatile
 	line	91
 	
-l1233:	
+l1264:	
+		decf	((_pedestrianPressed)),w	;volatile
+	btfss	status,2
+	goto	u1191
+	goto	u1190
+u1191:
+	goto	l1274
+u1190:
+	line	93
+	
+l1266:	
+	movlw	low(050h)
+	fcall	_UART_sendByte
+	line	94
+	
+l1268:	
+	clrf	(LED_Toggle@Pin)
+	movlw	low(03h)
+	fcall	_LED_Toggle
+	line	95
+	
+l1270:	
+	asmopt push
+asmopt off
+movlw  4
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+movwf	((??_main)+2)
+movlw	12
+movwf	((??_main)+1)
+	movlw	51
+movwf	((??_main))
+	u1297:
+decfsz	((??_main)),f
+	goto	u1297
+	decfsz	((??_main)+1),f
+	goto	u1297
+	decfsz	((??_main)+2),f
+	goto	u1297
+asmopt pop
+
+	line	98
+	
+l1272:	
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	clrf	(_pedestrianPressed)	;volatile
+	line	102
+	
+l1274:	
+		decf	((_objectDetected)),w	;volatile
+	btfss	status,2
+	goto	u1201
+	goto	u1200
+u1201:
+	goto	l1284
+u1200:
+	line	105
+	
+l1276:	
+	movlw	low(049h)
+	fcall	_UART_sendByte
+	line	106
+	
+l1278:	
+	clrf	(LED_Toggle@Pin)
+	movlw	low(03h)
+	fcall	_LED_Toggle
+	line	107
+	
+l1280:	
+	asmopt push
+asmopt off
+movlw  4
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+movwf	((??_main)+2)
+movlw	12
+movwf	((??_main)+1)
+	movlw	51
+movwf	((??_main))
+	u1307:
+decfsz	((??_main)),f
+	goto	u1307
+	decfsz	((??_main)+1),f
+	goto	u1307
+	decfsz	((??_main)+2),f
+	goto	u1307
+asmopt pop
+
+	line	110
+	
+l1282:	
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	clrf	(_objectDetected)	;volatile
+	line	113
+	
+l1284:	
 	fcall	_UART_available
 	xorlw	0
 	skipnz
-	goto	u1291
-	goto	u1290
-u1291:
-	goto	l1221
-u1290:
-	line	94
+	goto	u1211
+	goto	u1210
+u1211:
+	goto	l1264
+u1210:
+	line	116
 	
-l1235:	
+l1286:	
 	fcall	_UART_readByte
 	movwf	(main@piCommand)
-	line	97
+	line	119
 	
-l1237:	
-	movf	(main@piCommand),w
-	fcall	_LCD_sendData
-	goto	l1221
+l1288:	
+		movlw	80
+	xorwf	((main@piCommand)),w
+	btfsc	status,2
+	goto	u1221
+	goto	u1220
+u1221:
+	goto	l1292
+u1220:
+	
+l1290:	
+		movlw	73
+	xorwf	((main@piCommand)),w
+	btfss	status,2
+	goto	u1231
+	goto	u1230
+u1231:
+	goto	l1264
+u1230:
+	line	122
+	
+l1292:	
+	movlw	low(02h)
+	movwf	(LED_Toggle@Pin)
+	movlw	low(03h)
+	fcall	_LED_Toggle
+	goto	l1264
 	global	start
 	ljmp	start
 	callstack 0
-	line	101
+	line	127
 GLOBAL	__end_of_main
 	__end_of_main:
 	signat	_main,90
@@ -915,7 +988,7 @@ GLOBAL	__end_of_main
 
 ;; *************** function _setup *****************
 ;; Defined at:
-;;		line 38 in file "APP/main.c"
+;;		line 50 in file "APP/main_hardware_UART.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
@@ -935,73 +1008,158 @@ GLOBAL	__end_of_main
 ;;      Totals:         0       0       0       0       0
 ;;Total ram usage:        0 bytes
 ;; Hardware stack levels used: 1
-;; Hardware stack levels required when called: 8
+;; Hardware stack levels required when called: 6
 ;; This function calls:
 ;;		_EXT_INT_SetCallback
+;;		_GPIO_SetPinDirection
 ;;		_IOC_Enable
 ;;		_IOC_SetCallback
 ;;		_IR_Init
-;;		_LCD_init
+;;		_LED_Init
 ;;		_UART_init
+;;		_interrupt_EXT_edge
 ;;		_interrupt_EXT_enable
 ;;		_interrupt_globalEnable
+;;		_interrupt_peripheralEnable
 ;; This function is called by:
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
 psect	text1,local,class=CODE,delta=2,merge=1,group=0
-	line	38
+	line	50
 global __ptext1
 __ptext1:	;psect for function _setup
 psect	text1
-	file	"APP/main.c"
-	line	38
+	file	"APP/main_hardware_UART.c"
+	line	50
 	
 _setup:	
 ;incstack = 0
-;; hardware stack exceeded
-	callstack 0
+	callstack 1
 ; Regs used in _setup: [wreg-fsr0h+status,2+status,0+pclath+cstack]
-	line	41
+	line	53
 	
-l1187:	
+l1218:	
+	clrf	(GPIO_SetPinDirection@Pin)
+	clrf	(GPIO_SetPinDirection@Direction)
+	incf	(GPIO_SetPinDirection@Direction),f
+	movlw	low(01h)
+	fcall	_GPIO_SetPinDirection
+	line	56
 	fcall	_IR_Init
-	line	44
-	fcall	_LCD_init
-	line	47
-	fcall	_UART_init
-	line	51
+	line	58
+	bcf	status, 5	;RP0=0, select bank0
+	clrf	(LED_Init@Pin)
+	movlw	low(03h)
+	fcall	_LED_Init
+	line	59
+	movlw	low(02h)
+	bcf	status, 5	;RP0=0, select bank0
+	movwf	(LED_Init@Pin)
+	movlw	low(03h)
+	fcall	_LED_Init
+	line	61
 	
-l1189:	
+l1220:	
+	movlw	low(0)
+	fcall	_interrupt_EXT_edge
+	line	64
+	
+l1222:	
 	movlw	(low((fp__pedestrian_buttons_ISR-i1fpbase)))&0ffh
+	bcf	status, 5	;RP0=0, select bank0
 	movwf	(EXT_INT_SetCallback@ptr)
 	fcall	_EXT_INT_SetCallback
-	line	54
+	line	67
 	
-l1191:	
+l1224:	
 	movlw	(low((fp__objectDetected_IR_ISR-i1fpbase)))&0ffh
 	movwf	(IOC_SetCallback@ptr)
 	fcall	_IOC_SetCallback
-	line	57
+	line	70
 	
-l1193:	
+l1226:	
 	fcall	_interrupt_EXT_enable
-	line	58
+	line	71
 	
-l1195:	
+l1228:	
 	fcall	_IOC_Enable
-	line	61
+	line	74
 	
-l1197:	
+l1230:	
 	fcall	_interrupt_globalEnable
-	line	63
+	line	77
 	
-l42:	
+l1232:	
+	fcall	_interrupt_peripheralEnable
+	line	78
+	
+l1234:	
+	fcall	_UART_init
+	line	80
+	
+l50:	
 	return
 	callstack 0
 GLOBAL	__end_of_setup
 	__end_of_setup:
 	signat	_setup,89
+	global	_interrupt_peripheralEnable
+
+;; *************** function _interrupt_peripheralEnable *****************
+;; Defined at:
+;;		line 23 in file "MCAL/MCAL_interrupt/interrupt.c"
+;; Parameters:    Size  Location     Type
+;;		None
+;; Auto vars:     Size  Location     Type
+;;		None
+;; Return value:  Size  Location     Type
+;;                  1    wreg      void 
+;; Registers used:
+;;		None
+;; Tracked objects:
+;;		On entry : 300/0
+;;		On exit  : 300/0
+;;		Unchanged: 300/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       0       0       0       0
+;;      Locals:         0       0       0       0       0
+;;      Temps:          0       0       0       0       0
+;;      Totals:         0       0       0       0       0
+;;Total ram usage:        0 bytes
+;; Hardware stack levels used: 1
+;; Hardware stack levels required when called: 4
+;; This function calls:
+;;		Nothing
+;; This function is called by:
+;;		_setup
+;; This function uses a non-reentrant model
+;;
+psect	text2,local,class=CODE,delta=2,merge=1,group=0
+	file	"MCAL/MCAL_interrupt/interrupt.c"
+	line	23
+global __ptext2
+__ptext2:	;psect for function _interrupt_peripheralEnable
+psect	text2
+	file	"MCAL/MCAL_interrupt/interrupt.c"
+	line	23
+	
+_interrupt_peripheralEnable:	
+;incstack = 0
+	callstack 2
+; Regs used in _interrupt_peripheralEnable: []
+	line	25
+	
+l1136:	
+	bsf	(11)+(6/8),(6)&7	;volatile
+	line	26
+	
+l133:	
+	return
+	callstack 0
+GLOBAL	__end_of_interrupt_peripheralEnable
+	__end_of_interrupt_peripheralEnable:
+	signat	_interrupt_peripheralEnable,89
 	global	_interrupt_globalEnable
 
 ;; *************** function _interrupt_globalEnable *****************
@@ -1033,12 +1191,11 @@ GLOBAL	__end_of_setup
 ;;		_setup
 ;; This function uses a non-reentrant model
 ;;
-psect	text2,local,class=CODE,delta=2,merge=1,group=0
-	file	"MCAL/MCAL_interrupt/interrupt.c"
+psect	text3,local,class=CODE,delta=2,merge=1,group=0
 	line	13
-global __ptext2
-__ptext2:	;psect for function _interrupt_globalEnable
-psect	text2
+global __ptext3
+__ptext3:	;psect for function _interrupt_globalEnable
+psect	text3
 	file	"MCAL/MCAL_interrupt/interrupt.c"
 	line	13
 	
@@ -1048,11 +1205,11 @@ _interrupt_globalEnable:
 ; Regs used in _interrupt_globalEnable: []
 	line	15
 	
-l1171:	
+l1134:	
 	bsf	(11)+(7/8),(7)&7	;volatile
 	line	16
 	
-l116:	
+l127:	
 	return
 	callstack 0
 GLOBAL	__end_of_interrupt_globalEnable
@@ -1089,11 +1246,11 @@ GLOBAL	__end_of_interrupt_globalEnable
 ;;		_setup
 ;; This function uses a non-reentrant model
 ;;
-psect	text3,local,class=CODE,delta=2,merge=1,group=0
+psect	text4,local,class=CODE,delta=2,merge=1,group=0
 	line	28
-global __ptext3
-__ptext3:	;psect for function _interrupt_EXT_enable
-psect	text3
+global __ptext4
+__ptext4:	;psect for function _interrupt_EXT_enable
+psect	text4
 	file	"MCAL/MCAL_interrupt/interrupt.c"
 	line	28
 	
@@ -1103,524 +1260,97 @@ _interrupt_EXT_enable:
 ; Regs used in _interrupt_EXT_enable: []
 	line	30
 	
-l1165:	
+l1128:	
 	bsf	(11)+(4/8),(4)&7	;volatile
 	line	31
 	
-l125:	
+l136:	
 	return
 	callstack 0
 GLOBAL	__end_of_interrupt_EXT_enable
 	__end_of_interrupt_EXT_enable:
 	signat	_interrupt_EXT_enable,89
-	global	_UART_init
+	global	_interrupt_EXT_edge
 
-;; *************** function _UART_init *****************
+;; *************** function _interrupt_EXT_edge *****************
 ;; Defined at:
-;;		line 8 in file "MCAL/MCAL_UART/UART.c"
+;;		line 38 in file "MCAL/MCAL_interrupt/interrupt.c"
 ;; Parameters:    Size  Location     Type
-;;		None
+;;  edge            1    wreg     unsigned char 
 ;; Auto vars:     Size  Location     Type
-;;		None
+;;  edge            1    0[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;                  1    wreg      void 
 ;; Registers used:
-;;		wreg, fsr0l, fsr0h, status,2, status,0, pclath, cstack
-;; Tracked objects:
-;;		On entry : 0/0
-;;		On exit  : 300/0
-;;		Unchanged: 0/0
-;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
-;;      Params:         0       0       0       0       0
-;;      Locals:         0       0       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       0       0       0       0
-;;Total ram usage:        0 bytes
-;; Hardware stack levels used: 1
-;; Hardware stack levels required when called: 5
-;; This function calls:
-;;		_GPIO_SetPinDirection
-;; This function is called by:
-;;		_setup
-;; This function uses a non-reentrant model
-;;
-psect	text4,local,class=CODE,delta=2,merge=1,group=0
-	file	"MCAL/MCAL_UART/UART.c"
-	line	8
-global __ptext4
-__ptext4:	;psect for function _UART_init
-psect	text4
-	file	"MCAL/MCAL_UART/UART.c"
-	line	8
-	
-_UART_init:	
-;incstack = 0
-	callstack 1
-; Regs used in _UART_init: [wreg-fsr0h+status,2+status,0+pclath+cstack]
-	line	11
-	
-l1141:	
-	movlw	033h
-	bsf	status, 5	;RP0=1, select bank1
-	bcf	status, 6	;RP1=0, select bank1
-	movwf	(153)^080h	;volatile
-	line	15
-	bsf	(152)^080h+(5/8),(5)&7	;volatile
-	line	17
-	bsf	(152)^080h+(2/8),(2)&7	;volatile
-	line	19
-	
-l1143:	
-	movlw	low(0EFh)
-	andwf	(152)^080h,f	;volatile
-	line	23
-	
-l1145:	
-	movlw	low(06h)
-	bcf	status, 5	;RP0=0, select bank0
-	movwf	(GPIO_SetPinDirection@Pin)
-	clrf	(GPIO_SetPinDirection@Direction)
-	incf	(GPIO_SetPinDirection@Direction),f
-	movlw	low(02h)
-	fcall	_GPIO_SetPinDirection
-	line	24
-	
-l1147:	
-	movlw	low(07h)
-	bcf	status, 5	;RP0=0, select bank0
-	movwf	(GPIO_SetPinDirection@Pin)
-	clrf	(GPIO_SetPinDirection@Direction)
-	incf	(GPIO_SetPinDirection@Direction),f
-	movlw	low(02h)
-	fcall	_GPIO_SetPinDirection
-	line	29
-	
-l1149:	
-	bcf	status, 5	;RP0=0, select bank0
-	bsf	(24)+(7/8),(7)&7	;volatile
-	line	31
-	
-l1151:	
-	bsf	(24)+(4/8),(4)&7	;volatile
-	line	32
-	
-l161:	
-	return
-	callstack 0
-GLOBAL	__end_of_UART_init
-	__end_of_UART_init:
-	signat	_UART_init,89
-	global	_LCD_init
-
-;; *************** function _LCD_init *****************
-;; Defined at:
-;;		line 22 in file "HAL/HAL_LCD/HAL_LCD.c"
-;; Parameters:    Size  Location     Type
-;;		None
-;; Auto vars:     Size  Location     Type
-;;		None
-;; Return value:  Size  Location     Type
-;;                  1    wreg      void 
-;; Registers used:
-;;		wreg, fsr0l, fsr0h, status,2, status,0, pclath, cstack
+;;		wreg, status,2, status,0
 ;; Tracked objects:
 ;;		On entry : 200/0
-;;		On exit  : 0/0
+;;		On exit  : 300/100
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
-;;      Locals:         0       0       0       0       0
-;;      Temps:          0       2       0       0       0
-;;      Totals:         0       2       0       0       0
-;;Total ram usage:        2 bytes
+;;      Locals:         0       1       0       0       0
+;;      Temps:          0       0       0       0       0
+;;      Totals:         0       1       0       0       0
+;;Total ram usage:        1 bytes
 ;; Hardware stack levels used: 1
-;; Hardware stack levels required when called: 7
+;; Hardware stack levels required when called: 4
 ;; This function calls:
-;;		_GPIO_SetPinDirection
-;;		_LCD_sendCommand
+;;		Nothing
 ;; This function is called by:
 ;;		_setup
 ;; This function uses a non-reentrant model
 ;;
 psect	text5,local,class=CODE,delta=2,merge=1,group=0
-	file	"HAL/HAL_LCD/HAL_LCD.c"
-	line	22
+	line	38
 global __ptext5
-__ptext5:	;psect for function _LCD_init
+__ptext5:	;psect for function _interrupt_EXT_edge
 psect	text5
-	file	"HAL/HAL_LCD/HAL_LCD.c"
-	line	22
+	file	"MCAL/MCAL_interrupt/interrupt.c"
+	line	38
 	
-_LCD_init:	
+_interrupt_EXT_edge:	
 ;incstack = 0
-;; hardware stack exceeded
-	callstack 0
-; Regs used in _LCD_init: [wreg-fsr0h+status,2+status,0+pclath+cstack]
-	line	24
+	callstack 2
+; Regs used in _interrupt_EXT_edge: [wreg+status,2+status,0]
+	bcf	status, 5	;RP0=0, select bank0
+	movwf	(interrupt_EXT_edge@edge)
+	line	40
 	
-l1127:	
-	bcf	status, 5	;RP0=0, select bank0
-	clrf	(GPIO_SetPinDirection@Pin)
-	clrf	(GPIO_SetPinDirection@Direction)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinDirection
-	line	25
-	bcf	status, 5	;RP0=0, select bank0
-	clrf	(GPIO_SetPinDirection@Pin)
-	incf	(GPIO_SetPinDirection@Pin),f
-	clrf	(GPIO_SetPinDirection@Direction)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinDirection
-	line	26
-	movlw	low(02h)
-	bcf	status, 5	;RP0=0, select bank0
-	movwf	(GPIO_SetPinDirection@Pin)
-	clrf	(GPIO_SetPinDirection@Direction)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinDirection
-	line	27
-	movlw	low(03h)
-	bcf	status, 5	;RP0=0, select bank0
-	movwf	(GPIO_SetPinDirection@Pin)
-	clrf	(GPIO_SetPinDirection@Direction)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinDirection
-	line	28
-	movlw	low(04h)
-	bcf	status, 5	;RP0=0, select bank0
-	movwf	(GPIO_SetPinDirection@Pin)
-	clrf	(GPIO_SetPinDirection@Direction)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinDirection
-	line	29
-	movlw	low(05h)
-	bcf	status, 5	;RP0=0, select bank0
-	movwf	(GPIO_SetPinDirection@Pin)
-	clrf	(GPIO_SetPinDirection@Direction)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinDirection
-	line	30
-	movlw	low(06h)
-	bcf	status, 5	;RP0=0, select bank0
-	movwf	(GPIO_SetPinDirection@Pin)
-	clrf	(GPIO_SetPinDirection@Direction)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinDirection
-	line	31
-	movlw	low(07h)
-	bcf	status, 5	;RP0=0, select bank0
-	movwf	(GPIO_SetPinDirection@Pin)
-	clrf	(GPIO_SetPinDirection@Direction)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinDirection
-	line	36
-	bcf	status, 5	;RP0=0, select bank0
-	clrf	(GPIO_SetPinDirection@Pin)
-	incf	(GPIO_SetPinDirection@Pin),f
-	clrf	(GPIO_SetPinDirection@Direction)
-	movlw	low(01h)
-	fcall	_GPIO_SetPinDirection
-	line	37
-	movlw	low(02h)
-	bcf	status, 5	;RP0=0, select bank0
-	movwf	(GPIO_SetPinDirection@Pin)
-	clrf	(GPIO_SetPinDirection@Direction)
-	movlw	low(01h)
-	fcall	_GPIO_SetPinDirection
-	line	39
-	
-l1129:	
-	asmopt push
-asmopt off
-movlw	104
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-movwf	((??_LCD_init)+1)
-	movlw	227
-movwf	((??_LCD_init))
-	u1357:
-decfsz	((??_LCD_init)),f
-	goto	u1357
-	decfsz	((??_LCD_init)+1),f
-	goto	u1357
-	nop2
-asmopt pop
-
-	line	41
-	
-l1131:	
-	movlw	low(038h)
-	fcall	_LCD_sendCommand
+l1110:	
+		decf	((interrupt_EXT_edge@edge)),w
+	btfss	status,2
+	goto	u861
+	goto	u860
+u861:
+	goto	l1114
+u860:
 	line	42
-	asmopt push
-asmopt off
-movlw	3
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-movwf	((??_LCD_init)+1)
-	movlw	151
-movwf	((??_LCD_init))
-	u1367:
-decfsz	((??_LCD_init)),f
-	goto	u1367
-	decfsz	((??_LCD_init)+1),f
-	goto	u1367
-asmopt pop
-
-	line	44
 	
-l1133:	
-	movlw	low(0Ch)
-	fcall	_LCD_sendCommand
-	line	45
+l1112:	
+	bsf	status, 5	;RP0=1, select bank1
+	bsf	(129)^080h+(6/8),(6)&7	;volatile
+	line	43
+	goto	l144
+	line	46
 	
-l1135:	
-	asmopt push
-asmopt off
-movlw	3
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-movwf	((??_LCD_init)+1)
-	movlw	151
-movwf	((??_LCD_init))
-	u1377:
-decfsz	((??_LCD_init)),f
-	goto	u1377
-	decfsz	((??_LCD_init)+1),f
-	goto	u1377
-asmopt pop
-
+l1114:	
+	movlw	low(0BFh)
+	bsf	status, 5	;RP0=1, select bank1
+	andwf	(129)^080h,f	;volatile
 	line	49
-	movlw	low(01h)
-	fcall	_LCD_sendCommand
-	line	50
 	
-l1137:	
-	asmopt push
-asmopt off
-movlw	6
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-movwf	((??_LCD_init)+1)
-	movlw	47
-movwf	((??_LCD_init))
-	u1387:
-decfsz	((??_LCD_init)),f
-	goto	u1387
-	decfsz	((??_LCD_init)+1),f
-	goto	u1387
-	nop2
-asmopt pop
-
-	line	52
-	
-l1139:	
-	movlw	low(06h)
-	fcall	_LCD_sendCommand
-	line	54
-	
-l209:	
+l144:	
 	return
 	callstack 0
-GLOBAL	__end_of_LCD_init
-	__end_of_LCD_init:
-	signat	_LCD_init,89
-	global	_LCD_sendCommand
+GLOBAL	__end_of_interrupt_EXT_edge
+	__end_of_interrupt_EXT_edge:
+	signat	_interrupt_EXT_edge,4217
+	global	_UART_init
 
-;; *************** function _LCD_sendCommand *****************
+;; *************** function _UART_init *****************
 ;; Defined at:
-;;		line 83 in file "HAL/HAL_LCD/HAL_LCD.c"
-;; Parameters:    Size  Location     Type
-;;  command         1    wreg     unsigned char 
-;; Auto vars:     Size  Location     Type
-;;  command         1    7[BANK0 ] unsigned char 
-;; Return value:  Size  Location     Type
-;;                  1    wreg      void 
-;; Registers used:
-;;		wreg, fsr0l, fsr0h, status,2, status,0, pclath, cstack
-;; Tracked objects:
-;;		On entry : 0/0
-;;		On exit  : 0/0
-;;		Unchanged: 0/0
-;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
-;;      Params:         0       0       0       0       0
-;;      Locals:         0       1       0       0       0
-;;      Temps:          0       1       0       0       0
-;;      Totals:         0       2       0       0       0
-;;Total ram usage:        2 bytes
-;; Hardware stack levels used: 1
-;; Hardware stack levels required when called: 6
-;; This function calls:
-;;		_GPIO_SetPinValue
-;;		_LCD_enablePulse
-;;		_LCD_setMode_command
-;; This function is called by:
-;;		_LCD_init
-;; This function uses a non-reentrant model
-;;
-psect	text6,local,class=CODE,delta=2,merge=1,group=0
-	line	83
-global __ptext6
-__ptext6:	;psect for function _LCD_sendCommand
-psect	text6
-	file	"HAL/HAL_LCD/HAL_LCD.c"
-	line	83
-	
-_LCD_sendCommand:	
-;incstack = 0
-;; hardware stack exceeded
-	callstack 0
-; Regs used in _LCD_sendCommand: [wreg-fsr0h+status,2+status,0+pclath+cstack]
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-	movwf	(LCD_sendCommand@command)
-	line	85
-	
-l1111:	
-	fcall	_LCD_setMode_command
-	line	88
-	movf	(LCD_sendCommand@command),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	clrf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	89
-	movf	(LCD_sendCommand@command),w
-	movwf	(??_LCD_sendCommand)
-	clrc
-	rrf	(??_LCD_sendCommand),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	clrf	(GPIO_SetPinValue@Pin)
-	incf	(GPIO_SetPinValue@Pin),f
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	90
-	movf	(LCD_sendCommand@command),w
-	movwf	(??_LCD_sendCommand)
-	movlw	02h
-u1035:
-	clrc
-	rrf	(??_LCD_sendCommand),f
-	addlw	-1
-	skipz
-	goto	u1035
-	movf	(0+(??_LCD_sendCommand)),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	movlw	low(02h)
-	movwf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	91
-	movf	(LCD_sendCommand@command),w
-	movwf	(??_LCD_sendCommand)
-	movlw	03h
-u1045:
-	clrc
-	rrf	(??_LCD_sendCommand),f
-	addlw	-1
-	skipz
-	goto	u1045
-	movf	(0+(??_LCD_sendCommand)),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	movlw	low(03h)
-	movwf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	92
-	movf	(LCD_sendCommand@command),w
-	movwf	(??_LCD_sendCommand)
-	movlw	04h
-u1055:
-	clrc
-	rrf	(??_LCD_sendCommand),f
-	addlw	-1
-	skipz
-	goto	u1055
-	movf	(0+(??_LCD_sendCommand)),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	movlw	low(04h)
-	movwf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	93
-	movf	(LCD_sendCommand@command),w
-	movwf	(??_LCD_sendCommand)
-	movlw	05h
-u1065:
-	clrc
-	rrf	(??_LCD_sendCommand),f
-	addlw	-1
-	skipz
-	goto	u1065
-	movf	(0+(??_LCD_sendCommand)),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	movlw	low(05h)
-	movwf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	94
-	movf	(LCD_sendCommand@command),w
-	movwf	(??_LCD_sendCommand)
-	movlw	06h
-u1075:
-	clrc
-	rrf	(??_LCD_sendCommand),f
-	addlw	-1
-	skipz
-	goto	u1075
-	movf	(0+(??_LCD_sendCommand)),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	movlw	low(06h)
-	movwf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	95
-	movf	(LCD_sendCommand@command),w
-	movwf	(??_LCD_sendCommand)
-	movlw	07h
-u1085:
-	clrc
-	rrf	(??_LCD_sendCommand),f
-	addlw	-1
-	skipz
-	goto	u1085
-	movf	(0+(??_LCD_sendCommand)),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	movlw	low(07h)
-	movwf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	98
-	fcall	_LCD_enablePulse
-	line	100
-	
-l221:	
-	return
-	callstack 0
-GLOBAL	__end_of_LCD_sendCommand
-	__end_of_LCD_sendCommand:
-	signat	_LCD_sendCommand,4217
-	global	_LCD_setMode_command
-
-;; *************** function _LCD_setMode_command *****************
-;; Defined at:
-;;		line 78 in file "HAL/HAL_LCD/HAL_LCD.c"
+;;		line 8 in file "MCAL/MCAL_UART/UART.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
@@ -1642,40 +1372,138 @@ GLOBAL	__end_of_LCD_sendCommand
 ;; Hardware stack levels used: 1
 ;; Hardware stack levels required when called: 5
 ;; This function calls:
-;;		_GPIO_SetPinValue
+;;		_GPIO_SetPinDirection
 ;; This function is called by:
-;;		_LCD_sendCommand
+;;		_setup
+;; This function uses a non-reentrant model
+;;
+psect	text6,local,class=CODE,delta=2,merge=1,group=0
+	file	"MCAL/MCAL_UART/UART.c"
+	line	8
+global __ptext6
+__ptext6:	;psect for function _UART_init
+psect	text6
+	file	"MCAL/MCAL_UART/UART.c"
+	line	8
+	
+_UART_init:	
+;incstack = 0
+	callstack 1
+; Regs used in _UART_init: [wreg-fsr0h+status,2+status,0+pclath+cstack]
+	line	11
+	
+l1138:	
+	movlw	033h
+	bsf	status, 5	;RP0=1, select bank1
+	movwf	(153)^080h	;volatile
+	line	15
+	bsf	(152)^080h+(5/8),(5)&7	;volatile
+	line	17
+	bsf	(152)^080h+(2/8),(2)&7	;volatile
+	line	19
+	
+l1140:	
+	movlw	low(0EFh)
+	andwf	(152)^080h,f	;volatile
+	line	23
+	
+l1142:	
+	movlw	low(06h)
+	bcf	status, 5	;RP0=0, select bank0
+	movwf	(GPIO_SetPinDirection@Pin)
+	clrf	(GPIO_SetPinDirection@Direction)
+	incf	(GPIO_SetPinDirection@Direction),f
+	movlw	low(02h)
+	fcall	_GPIO_SetPinDirection
+	line	24
+	
+l1144:	
+	movlw	low(07h)
+	bcf	status, 5	;RP0=0, select bank0
+	movwf	(GPIO_SetPinDirection@Pin)
+	clrf	(GPIO_SetPinDirection@Direction)
+	incf	(GPIO_SetPinDirection@Direction),f
+	movlw	low(02h)
+	fcall	_GPIO_SetPinDirection
+	line	29
+	
+l1146:	
+	bcf	status, 5	;RP0=0, select bank0
+	bsf	(24)+(7/8),(7)&7	;volatile
+	line	31
+	
+l1148:	
+	bsf	(24)+(4/8),(4)&7	;volatile
+	line	32
+	
+l172:	
+	return
+	callstack 0
+GLOBAL	__end_of_UART_init
+	__end_of_UART_init:
+	signat	_UART_init,89
+	global	_LED_Init
+
+;; *************** function _LED_Init *****************
+;; Defined at:
+;;		line 9 in file "HAL/HAL_LED/HAL_LED.c"
+;; Parameters:    Size  Location     Type
+;;  Port            1    wreg     unsigned char 
+;;  Pin             1    4[BANK0 ] unsigned char 
+;; Auto vars:     Size  Location     Type
+;;  Port            1    5[BANK0 ] unsigned char 
+;; Return value:  Size  Location     Type
+;;                  1    wreg      void 
+;; Registers used:
+;;		wreg, fsr0l, fsr0h, status,2, status,0, pclath, cstack
+;; Tracked objects:
+;;		On entry : 300/0
+;;		On exit  : 200/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       1       0       0       0
+;;      Locals:         0       1       0       0       0
+;;      Temps:          0       0       0       0       0
+;;      Totals:         0       2       0       0       0
+;;Total ram usage:        2 bytes
+;; Hardware stack levels used: 1
+;; Hardware stack levels required when called: 5
+;; This function calls:
+;;		_GPIO_SetPinDirection
+;; This function is called by:
+;;		_setup
 ;; This function uses a non-reentrant model
 ;;
 psect	text7,local,class=CODE,delta=2,merge=1,group=0
-	line	78
+	file	"HAL/HAL_LED/HAL_LED.c"
+	line	9
 global __ptext7
-__ptext7:	;psect for function _LCD_setMode_command
+__ptext7:	;psect for function _LED_Init
 psect	text7
-	file	"HAL/HAL_LCD/HAL_LCD.c"
-	line	78
+	file	"HAL/HAL_LED/HAL_LED.c"
+	line	9
 	
-_LCD_setMode_command:	
+_LED_Init:	
 ;incstack = 0
-;; hardware stack exceeded
-	callstack 0
-; Regs used in _LCD_setMode_command: [wreg-fsr0h+status,2+status,0+pclath+cstack]
-	line	80
+	callstack 1
+; Regs used in _LED_Init: [wreg-fsr0h+status,2+status,0+pclath+cstack]
+	movwf	(LED_Init@Port)
+	line	11
 	
-l1053:	
-	clrf	(GPIO_SetPinValue@Pin)
-	incf	(GPIO_SetPinValue@Pin),f
-	clrf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	fcall	_GPIO_SetPinValue
-	line	81
+l1108:	
+	movf	(LED_Init@Pin),w
+	movwf	(GPIO_SetPinDirection@Pin)
+	clrf	(GPIO_SetPinDirection@Direction)
+	movf	(LED_Init@Port),w
+	fcall	_GPIO_SetPinDirection
+	line	12
 	
-l218:	
+l203:	
 	return
 	callstack 0
-GLOBAL	__end_of_LCD_setMode_command
-	__end_of_LCD_setMode_command:
-	signat	_LCD_setMode_command,89
+GLOBAL	__end_of_LED_Init
+	__end_of_LED_Init:
+	signat	_LED_Init,8313
 	global	_IR_Init
 
 ;; *************** function _IR_Init *****************
@@ -1690,7 +1518,7 @@ GLOBAL	__end_of_LCD_setMode_command
 ;; Registers used:
 ;;		wreg, fsr0l, fsr0h, status,2, status,0, pclath, cstack
 ;; Tracked objects:
-;;		On entry : B00/0
+;;		On entry : 200/0
 ;;		On exit  : 200/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
@@ -1722,8 +1550,9 @@ _IR_Init:
 ; Regs used in _IR_Init: [wreg-fsr0h+status,2+status,0+pclath+cstack]
 	line	12
 	
-l1125:	
+l1106:	
 	movlw	low(07h)
+	bcf	status, 5	;RP0=0, select bank0
 	movwf	(GPIO_SetPinDirection@Pin)
 	clrf	(GPIO_SetPinDirection@Direction)
 	incf	(GPIO_SetPinDirection@Direction),f
@@ -1755,7 +1584,7 @@ l1125:
 	fcall	_GPIO_SetPinDirection
 	line	16
 	
-l190:	
+l221:	
 	return
 	callstack 0
 GLOBAL	__end_of_IR_Init
@@ -1791,9 +1620,10 @@ GLOBAL	__end_of_IR_Init
 ;; This function calls:
 ;;		Nothing
 ;; This function is called by:
+;;		_setup
 ;;		_UART_init
+;;		_LED_Init
 ;;		_IR_Init
-;;		_LCD_init
 ;; This function uses a non-reentrant model
 ;;
 psect	text9,local,class=CODE,delta=2,merge=1,group=0
@@ -1812,246 +1642,246 @@ _GPIO_SetPinDirection:
 	movwf	(GPIO_SetPinDirection@Port)
 	line	11
 	
-l1055:	
-	goto	l1089
+l1038:	
+	goto	l1072
 	line	14
 	
-l1057:	
+l1040:	
 	movf	((GPIO_SetPinDirection@Direction)),w
 	btfss	status,2
-	goto	u831
-	goto	u830
-u831:
-	goto	l1061
-u830:
+	goto	u651
+	goto	u650
+u651:
+	goto	l1044
+u650:
 	line	15
 	
-l1059:	
+l1042:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinDirection)
 	incf	(GPIO_SetPinDirection@Pin),w
-	goto	u844
-u845:
+	goto	u664
+u665:
 	clrc
 	rlf	(??_GPIO_SetPinDirection),f
-u844:
+u664:
 	addlw	-1
 	skipz
-	goto	u845
+	goto	u665
 	movf	(0+(??_GPIO_SetPinDirection)),w
 	xorlw	0ffh
 	bsf	status, 5	;RP0=1, select bank1
 	andwf	(133)^080h,f	;volatile
-	goto	l74
+	goto	l85
 	line	17
 	
-l1061:	
+l1044:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinDirection)
 	incf	(GPIO_SetPinDirection@Pin),w
-	goto	u854
-u855:
+	goto	u674
+u675:
 	clrc
 	rlf	(??_GPIO_SetPinDirection),f
-u854:
+u674:
 	addlw	-1
 	skipz
-	goto	u855
+	goto	u675
 	movf	(0+(??_GPIO_SetPinDirection)),w
 	bsf	status, 5	;RP0=1, select bank1
 	iorwf	(133)^080h,f	;volatile
-	goto	l74
+	goto	l85
 	line	21
 	
-l1063:	
+l1046:	
 	movf	((GPIO_SetPinDirection@Direction)),w
 	btfss	status,2
-	goto	u861
-	goto	u860
-u861:
-	goto	l1067
-u860:
+	goto	u681
+	goto	u680
+u681:
+	goto	l1050
+u680:
 	line	22
 	
-l1065:	
+l1048:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinDirection)
 	incf	(GPIO_SetPinDirection@Pin),w
-	goto	u874
-u875:
+	goto	u694
+u695:
 	clrc
 	rlf	(??_GPIO_SetPinDirection),f
-u874:
+u694:
 	addlw	-1
 	skipz
-	goto	u875
+	goto	u695
 	movf	(0+(??_GPIO_SetPinDirection)),w
 	xorlw	0ffh
 	bsf	status, 5	;RP0=1, select bank1
 	andwf	(134)^080h,f	;volatile
-	goto	l74
+	goto	l85
 	line	24
 	
-l1067:	
+l1050:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinDirection)
 	incf	(GPIO_SetPinDirection@Pin),w
-	goto	u884
-u885:
+	goto	u704
+u705:
 	clrc
 	rlf	(??_GPIO_SetPinDirection),f
-u884:
+u704:
 	addlw	-1
 	skipz
-	goto	u885
+	goto	u705
 	movf	(0+(??_GPIO_SetPinDirection)),w
 	bsf	status, 5	;RP0=1, select bank1
 	iorwf	(134)^080h,f	;volatile
-	goto	l74
+	goto	l85
 	line	28
 	
-l1069:	
+l1052:	
 	movf	((GPIO_SetPinDirection@Direction)),w
 	btfss	status,2
-	goto	u891
-	goto	u890
-u891:
-	goto	l1073
-u890:
+	goto	u711
+	goto	u710
+u711:
+	goto	l1056
+u710:
 	line	29
 	
-l1071:	
+l1054:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinDirection)
 	incf	(GPIO_SetPinDirection@Pin),w
-	goto	u904
-u905:
+	goto	u724
+u725:
 	clrc
 	rlf	(??_GPIO_SetPinDirection),f
-u904:
+u724:
 	addlw	-1
 	skipz
-	goto	u905
+	goto	u725
 	movf	(0+(??_GPIO_SetPinDirection)),w
 	xorlw	0ffh
 	bsf	status, 5	;RP0=1, select bank1
 	andwf	(135)^080h,f	;volatile
-	goto	l74
+	goto	l85
 	line	31
 	
-l1073:	
+l1056:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinDirection)
 	incf	(GPIO_SetPinDirection@Pin),w
-	goto	u914
-u915:
+	goto	u734
+u735:
 	clrc
 	rlf	(??_GPIO_SetPinDirection),f
-u914:
+u734:
 	addlw	-1
 	skipz
-	goto	u915
+	goto	u735
 	movf	(0+(??_GPIO_SetPinDirection)),w
 	bsf	status, 5	;RP0=1, select bank1
 	iorwf	(135)^080h,f	;volatile
-	goto	l74
+	goto	l85
 	line	35
 	
-l1075:	
+l1058:	
 	movf	((GPIO_SetPinDirection@Direction)),w
 	btfss	status,2
-	goto	u921
-	goto	u920
-u921:
-	goto	l1079
-u920:
+	goto	u741
+	goto	u740
+u741:
+	goto	l1062
+u740:
 	line	36
 	
-l1077:	
+l1060:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinDirection)
 	incf	(GPIO_SetPinDirection@Pin),w
-	goto	u934
-u935:
+	goto	u754
+u755:
 	clrc
 	rlf	(??_GPIO_SetPinDirection),f
-u934:
+u754:
 	addlw	-1
 	skipz
-	goto	u935
+	goto	u755
 	movf	(0+(??_GPIO_SetPinDirection)),w
 	xorlw	0ffh
 	bsf	status, 5	;RP0=1, select bank1
 	andwf	(136)^080h,f	;volatile
-	goto	l74
+	goto	l85
 	line	38
 	
-l1079:	
+l1062:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinDirection)
 	incf	(GPIO_SetPinDirection@Pin),w
-	goto	u944
-u945:
+	goto	u764
+u765:
 	clrc
 	rlf	(??_GPIO_SetPinDirection),f
-u944:
+u764:
 	addlw	-1
 	skipz
-	goto	u945
+	goto	u765
 	movf	(0+(??_GPIO_SetPinDirection)),w
 	bsf	status, 5	;RP0=1, select bank1
 	iorwf	(136)^080h,f	;volatile
-	goto	l74
+	goto	l85
 	line	42
 	
-l1081:	
+l1064:	
 	movf	((GPIO_SetPinDirection@Direction)),w
 	btfss	status,2
-	goto	u951
-	goto	u950
-u951:
-	goto	l1085
-u950:
+	goto	u771
+	goto	u770
+u771:
+	goto	l1068
+u770:
 	line	43
 	
-l1083:	
+l1066:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinDirection)
 	incf	(GPIO_SetPinDirection@Pin),w
-	goto	u964
-u965:
+	goto	u784
+u785:
 	clrc
 	rlf	(??_GPIO_SetPinDirection),f
-u964:
+u784:
 	addlw	-1
 	skipz
-	goto	u965
+	goto	u785
 	movf	(0+(??_GPIO_SetPinDirection)),w
 	xorlw	0ffh
 	bsf	status, 5	;RP0=1, select bank1
 	andwf	(137)^080h,f	;volatile
-	goto	l74
+	goto	l85
 	line	45
 	
-l1085:	
+l1068:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinDirection)
 	incf	(GPIO_SetPinDirection@Pin),w
-	goto	u974
-u975:
+	goto	u794
+u795:
 	clrc
 	rlf	(??_GPIO_SetPinDirection),f
-u974:
+u794:
 	addlw	-1
 	skipz
-	goto	u975
+	goto	u795
 	movf	(0+(??_GPIO_SetPinDirection)),w
 	bsf	status, 5	;RP0=1, select bank1
 	iorwf	(137)^080h,f	;volatile
-	goto	l74
+	goto	l85
 	line	50
 	
-l1089:	
+l1072:	
 	movf	(GPIO_SetPinDirection@Port),w
 	; Switch size 1, requested type "simple"
 ; Number of cases is 5, Range of values is 0 to 4
@@ -2066,25 +1896,25 @@ l1089:
 	asmopt off
 	xorlw	0^0	; case 0
 	skipnz
-	goto	l1057
+	goto	l1040
 	xorlw	1^0	; case 1
 	skipnz
-	goto	l1063
+	goto	l1046
 	xorlw	2^1	; case 2
 	skipnz
-	goto	l1069
+	goto	l1052
 	xorlw	3^2	; case 3
 	skipnz
-	goto	l1075
+	goto	l1058
 	xorlw	4^3	; case 4
 	skipnz
-	goto	l1081
-	goto	l74
+	goto	l1064
+	goto	l85
 	asmopt pop
 
 	line	51
 	
-l74:	
+l85:	
 	return
 	callstack 0
 GLOBAL	__end_of_GPIO_SetPinDirection
@@ -2137,22 +1967,22 @@ _IOC_SetCallback:
 ; Regs used in _IOC_SetCallback: [wreg+status,2+status,0]
 	line	76
 	
-l1159:	
+l1122:	
 	movf	((IOC_SetCallback@ptr)),w
 	btfsc	status,2
-	goto	u1111
-	goto	u1110
-u1111:
-	goto	l147
-u1110:
+	goto	u881
+	goto	u880
+u881:
+	goto	l158
+u880:
 	line	78
 	
-l1161:	
+l1124:	
 	movf	(IOC_SetCallback@ptr),w
 	movwf	(_Global_IOC_Callback)
 	line	83
 	
-l147:	
+l158:	
 	return
 	callstack 0
 GLOBAL	__end_of_IOC_SetCallback
@@ -2203,16 +2033,16 @@ _IOC_Enable:
 ; Regs used in _IOC_Enable: [wreg+status,2+status,0]
 	line	69
 	
-l1167:	
+l1130:	
 	movlw	low(0FEh)
 	andwf	(11),f	;volatile
 	line	71
 	
-l1169:	
+l1132:	
 	bsf	(11)+(3/8),(3)&7	;volatile
 	line	72
 	
-l143:	
+l154:	
 	return
 	callstack 0
 GLOBAL	__end_of_IOC_Enable
@@ -2264,22 +2094,22 @@ _EXT_INT_SetCallback:
 ; Regs used in _EXT_INT_SetCallback: [wreg+status,2+status,0]
 	line	53
 	
-l1153:	
+l1116:	
 	movf	((EXT_INT_SetCallback@ptr)),w
 	btfsc	status,2
-	goto	u1101
-	goto	u1100
-u1101:
-	goto	l137
-u1100:
+	goto	u871
+	goto	u870
+u871:
+	goto	l148
+u870:
 	line	55
 	
-l1155:	
+l1118:	
 	movf	(EXT_INT_SetCallback@ptr),w
 	movwf	(_Global_EXT_Callback)
 	line	59
 	
-l137:	
+l148:	
 	return
 	callstack 0
 GLOBAL	__end_of_EXT_INT_SetCallback
@@ -2332,32 +2162,32 @@ _UART_sendByte:
 	movwf	(UART_sendByte@data)
 	line	39
 	
-l1199:	
+l1236:	
 	
-l1201:	
+l1238:	
 	movf	(12),w	;volatile
 	movwf	(??_UART_sendByte)
 	movlw	04h
-u1165:
+u1135:
 	clrc
 	rrf	(??_UART_sendByte),f
 	addlw	-1
 	skipz
-	goto	u1165
+	goto	u1135
 	btfss	(0+(??_UART_sendByte)),(0)&7
-	goto	u1171
-	goto	u1170
-u1171:
-	goto	l1201
-u1170:
+	goto	u1141
+	goto	u1140
+u1141:
+	goto	l1238
+u1140:
 	line	41
 	
-l1203:	
+l1240:	
 	movf	(UART_sendByte@data),w
 	movwf	(25)	;volatile
 	line	42
 	
-l167:	
+l178:	
 	return
 	callstack 0
 GLOBAL	__end_of_UART_sendByte
@@ -2408,31 +2238,31 @@ _UART_readByte:
 ; Regs used in _UART_readByte: [wreg+status,2+status,0]
 	line	70
 	
-l1209:	
+l1254:	
 	
-l1211:	
+l1256:	
 	movf	(12),w	;volatile
 	movwf	(??_UART_readByte)
 	movlw	05h
-u1195:
+u1175:
 	clrc
 	rrf	(??_UART_readByte),f
 	addlw	-1
 	skipz
-	goto	u1195
+	goto	u1175
 	btfss	(0+(??_UART_readByte)),(0)&7
-	goto	u1201
-	goto	u1200
-u1201:
-	goto	l1211
-u1200:
+	goto	u1181
+	goto	u1180
+u1181:
+	goto	l1256
+u1180:
 	line	75
 	
-l1213:	
+l1258:	
 	movf	(26),w	;volatile
 	line	76
 	
-l183:	
+l194:	
 	return
 	callstack 0
 GLOBAL	__end_of_UART_readByte
@@ -2483,224 +2313,37 @@ _UART_available:
 ; Regs used in _UART_available: [wreg+status,2+status,0]
 	line	63
 	
-l1205:	
+l1250:	
 	movf	(12),w	;volatile
 	movwf	(??_UART_available)
 	movlw	05h
-u1185:
+u1165:
 	clrc
 	rrf	(??_UART_available),f
 	addlw	-1
 	skipz
-	goto	u1185
+	goto	u1165
 	movf	(0+(??_UART_available)),w
 	andlw	01h
 	line	64
 	
-l177:	
+l188:	
 	return
 	callstack 0
 GLOBAL	__end_of_UART_available
 	__end_of_UART_available:
 	signat	_UART_available,89
-	global	_LCD_sendData
+	global	_LED_Toggle
 
-;; *************** function _LCD_sendData *****************
+;; *************** function _LED_Toggle *****************
 ;; Defined at:
-;;		line 61 in file "HAL/HAL_LCD/HAL_LCD.c"
+;;		line 24 in file "HAL/HAL_LED/HAL_LED.c"
 ;; Parameters:    Size  Location     Type
-;;  data            1    wreg     unsigned char 
+;;  Port            1    wreg     unsigned char 
+;;  Pin             1    4[BANK0 ] unsigned char 
 ;; Auto vars:     Size  Location     Type
-;;  data            1    7[BANK0 ] unsigned char 
-;; Return value:  Size  Location     Type
-;;                  1    wreg      void 
-;; Registers used:
-;;		wreg, fsr0l, fsr0h, status,2, status,0, pclath, cstack
-;; Tracked objects:
-;;		On entry : 300/0
-;;		On exit  : 0/0
-;;		Unchanged: 0/0
-;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
-;;      Params:         0       0       0       0       0
-;;      Locals:         0       1       0       0       0
-;;      Temps:          0       1       0       0       0
-;;      Totals:         0       2       0       0       0
-;;Total ram usage:        2 bytes
-;; Hardware stack levels used: 1
-;; Hardware stack levels required when called: 6
-;; This function calls:
-;;		_GPIO_SetPinValue
-;;		_LCD_enablePulse
-;;		_LCD_setMode_data
-;; This function is called by:
-;;		_main
-;; This function uses a non-reentrant model
-;;
-psect	text16,local,class=CODE,delta=2,merge=1,group=0
-	file	"HAL/HAL_LCD/HAL_LCD.c"
-	line	61
-global __ptext16
-__ptext16:	;psect for function _LCD_sendData
-psect	text16
-	file	"HAL/HAL_LCD/HAL_LCD.c"
-	line	61
-	
-_LCD_sendData:	
-;incstack = 0
-	callstack 1
-; Regs used in _LCD_sendData: [wreg-fsr0h+status,2+status,0+pclath+cstack]
-	movwf	(LCD_sendData@data)
-	line	63
-	
-l1217:	
-	fcall	_LCD_setMode_data
-	line	66
-	movf	(LCD_sendData@data),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	clrf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	67
-	movf	(LCD_sendData@data),w
-	movwf	(??_LCD_sendData)
-	clrc
-	rrf	(??_LCD_sendData),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	clrf	(GPIO_SetPinValue@Pin)
-	incf	(GPIO_SetPinValue@Pin),f
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	68
-	movf	(LCD_sendData@data),w
-	movwf	(??_LCD_sendData)
-	movlw	02h
-u1215:
-	clrc
-	rrf	(??_LCD_sendData),f
-	addlw	-1
-	skipz
-	goto	u1215
-	movf	(0+(??_LCD_sendData)),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	movlw	low(02h)
-	movwf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	69
-	movf	(LCD_sendData@data),w
-	movwf	(??_LCD_sendData)
-	movlw	03h
-u1225:
-	clrc
-	rrf	(??_LCD_sendData),f
-	addlw	-1
-	skipz
-	goto	u1225
-	movf	(0+(??_LCD_sendData)),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	movlw	low(03h)
-	movwf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	70
-	movf	(LCD_sendData@data),w
-	movwf	(??_LCD_sendData)
-	movlw	04h
-u1235:
-	clrc
-	rrf	(??_LCD_sendData),f
-	addlw	-1
-	skipz
-	goto	u1235
-	movf	(0+(??_LCD_sendData)),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	movlw	low(04h)
-	movwf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	71
-	movf	(LCD_sendData@data),w
-	movwf	(??_LCD_sendData)
-	movlw	05h
-u1245:
-	clrc
-	rrf	(??_LCD_sendData),f
-	addlw	-1
-	skipz
-	goto	u1245
-	movf	(0+(??_LCD_sendData)),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	movlw	low(05h)
-	movwf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	72
-	movf	(LCD_sendData@data),w
-	movwf	(??_LCD_sendData)
-	movlw	06h
-u1255:
-	clrc
-	rrf	(??_LCD_sendData),f
-	addlw	-1
-	skipz
-	goto	u1255
-	movf	(0+(??_LCD_sendData)),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	movlw	low(06h)
-	movwf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	73
-	movf	(LCD_sendData@data),w
-	movwf	(??_LCD_sendData)
-	movlw	07h
-u1265:
-	clrc
-	rrf	(??_LCD_sendData),f
-	addlw	-1
-	skipz
-	goto	u1265
-	movf	(0+(??_LCD_sendData)),w
-	movwf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	andwf	(GPIO_SetPinValue@Value),f
-	movlw	low(07h)
-	movwf	(GPIO_SetPinValue@Pin)
-	movlw	low(03h)
-	fcall	_GPIO_SetPinValue
-	line	75
-	fcall	_LCD_enablePulse
-	line	76
-	
-l215:	
-	return
-	callstack 0
-GLOBAL	__end_of_LCD_sendData
-	__end_of_LCD_sendData:
-	signat	_LCD_sendData,4217
-	global	_LCD_setMode_data
-
-;; *************** function _LCD_setMode_data *****************
-;; Defined at:
-;;		line 56 in file "HAL/HAL_LCD/HAL_LCD.c"
-;; Parameters:    Size  Location     Type
-;;		None
-;; Auto vars:     Size  Location     Type
-;;		None
+;;  Port            1    6[BANK0 ] unsigned char 
+;;  current         1    5[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;                  1    wreg      void 
 ;; Registers used:
@@ -2710,155 +2353,78 @@ GLOBAL	__end_of_LCD_sendData
 ;;		On exit  : 300/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
-;;      Params:         0       0       0       0       0
-;;      Locals:         0       0       0       0       0
+;;      Params:         0       1       0       0       0
+;;      Locals:         0       2       0       0       0
 ;;      Temps:          0       0       0       0       0
-;;      Totals:         0       0       0       0       0
-;;Total ram usage:        0 bytes
+;;      Totals:         0       3       0       0       0
+;;Total ram usage:        3 bytes
 ;; Hardware stack levels used: 1
 ;; Hardware stack levels required when called: 5
 ;; This function calls:
+;;		_GPIO_GetPinValue
 ;;		_GPIO_SetPinValue
 ;; This function is called by:
-;;		_LCD_sendData
+;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text17,local,class=CODE,delta=2,merge=1,group=0
-	line	56
-global __ptext17
-__ptext17:	;psect for function _LCD_setMode_data
-psect	text17
-	file	"HAL/HAL_LCD/HAL_LCD.c"
-	line	56
+psect	text16,local,class=CODE,delta=2,merge=1,group=0
+	file	"HAL/HAL_LED/HAL_LED.c"
+	line	24
+global __ptext16
+__ptext16:	;psect for function _LED_Toggle
+psect	text16
+	file	"HAL/HAL_LED/HAL_LED.c"
+	line	24
 	
-_LCD_setMode_data:	
+_LED_Toggle:	
 ;incstack = 0
-	callstack 1
-; Regs used in _LCD_setMode_data: [wreg-fsr0h+status,2+status,0+pclath+cstack]
-	line	58
+	callstack 2
+; Regs used in _LED_Toggle: [wreg-fsr0h+status,2+status,0+pclath+cstack]
+	movwf	(LED_Toggle@Port)
+	line	26
 	
-l1173:	
-	clrf	(GPIO_SetPinValue@Pin)
-	incf	(GPIO_SetPinValue@Pin),f
+l1242:	
+	movf	(LED_Toggle@Pin),w
+	movwf	(GPIO_GetPinValue@Pin)
+	movf	(LED_Toggle@Port),w
+	fcall	_GPIO_GetPinValue
+	movwf	(LED_Toggle@current)
+	line	28
+	
+l1244:	
+		decf	((LED_Toggle@current)),w
+	btfss	status,2
+	goto	u1151
+	goto	u1150
+u1151:
+	goto	l1248
+u1150:
+	line	29
+	
+l1246:	
+	movf	(LED_Toggle@Pin),w
+	movwf	(GPIO_SetPinValue@Pin)
 	clrf	(GPIO_SetPinValue@Value)
-	incf	(GPIO_SetPinValue@Value),f
-	movlw	low(01h)
+	movf	(LED_Toggle@Port),w
 	fcall	_GPIO_SetPinValue
-	line	59
+	goto	l214
+	line	31
 	
-l212:	
-	return
-	callstack 0
-GLOBAL	__end_of_LCD_setMode_data
-	__end_of_LCD_setMode_data:
-	signat	_LCD_setMode_data,89
-	global	_LCD_enablePulse
-
-;; *************** function _LCD_enablePulse *****************
-;; Defined at:
-;;		line 13 in file "HAL/HAL_LCD/HAL_LCD.c"
-;; Parameters:    Size  Location     Type
-;;		None
-;; Auto vars:     Size  Location     Type
-;;		None
-;; Return value:  Size  Location     Type
-;;                  1    wreg      void 
-;; Registers used:
-;;		wreg, fsr0l, fsr0h, status,2, status,0, pclath, cstack
-;; Tracked objects:
-;;		On entry : 300/0
-;;		On exit  : 0/0
-;;		Unchanged: 0/0
-;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
-;;      Params:         0       0       0       0       0
-;;      Locals:         0       0       0       0       0
-;;      Temps:          0       2       0       0       0
-;;      Totals:         0       2       0       0       0
-;;Total ram usage:        2 bytes
-;; Hardware stack levels used: 1
-;; Hardware stack levels required when called: 4
-;; This function calls:
-;;		_GPIO_SetPinValue
-;; This function is called by:
-;;		_LCD_sendData
-;;		_LCD_sendCommand
-;; This function uses a non-reentrant model
-;;
-psect	text18,local,class=CODE,delta=2,merge=1,group=0
-	line	13
-global __ptext18
-__ptext18:	;psect for function _LCD_enablePulse
-psect	text18
-	file	"HAL/HAL_LCD/HAL_LCD.c"
-	line	13
-	
-_LCD_enablePulse:	
-;incstack = 0
-	callstack 0
-; Regs used in _LCD_enablePulse: [wreg-fsr0h+status,2+status,0+pclath+cstack]
-	line	15
-	
-l1047:	
-	movlw	low(02h)
+l1248:	
+	movf	(LED_Toggle@Pin),w
 	movwf	(GPIO_SetPinValue@Pin)
 	clrf	(GPIO_SetPinValue@Value)
 	incf	(GPIO_SetPinValue@Value),f
-	movlw	low(01h)
+	movf	(LED_Toggle@Port),w
 	fcall	_GPIO_SetPinValue
-	line	16
+	line	32
 	
-l1049:	
-	asmopt push
-asmopt off
-movlw	6
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-movwf	((??_LCD_enablePulse)+1)
-	movlw	47
-movwf	((??_LCD_enablePulse))
-	u1397:
-decfsz	((??_LCD_enablePulse)),f
-	goto	u1397
-	decfsz	((??_LCD_enablePulse)+1),f
-	goto	u1397
-	nop2
-asmopt pop
-
-	line	17
-	
-l1051:	
-	movlw	low(02h)
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-	movwf	(GPIO_SetPinValue@Pin)
-	clrf	(GPIO_SetPinValue@Value)
-	movlw	low(01h)
-	fcall	_GPIO_SetPinValue
-	line	18
-	asmopt push
-asmopt off
-movlw	6
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-movwf	((??_LCD_enablePulse)+1)
-	movlw	47
-movwf	((??_LCD_enablePulse))
-	u1407:
-decfsz	((??_LCD_enablePulse)),f
-	goto	u1407
-	decfsz	((??_LCD_enablePulse)+1),f
-	goto	u1407
-	nop2
-asmopt pop
-
-	line	20
-	
-l206:	
+l214:	
 	return
 	callstack 0
-GLOBAL	__end_of_LCD_enablePulse
-	__end_of_LCD_enablePulse:
-	signat	_LCD_enablePulse,89
+GLOBAL	__end_of_LED_Toggle
+	__end_of_LED_Toggle:
+	signat	_LED_Toggle,8313
 	global	_GPIO_SetPinValue
 
 ;; *************** function _GPIO_SetPinValue *****************
@@ -2889,260 +2455,255 @@ GLOBAL	__end_of_LCD_enablePulse
 ;; This function calls:
 ;;		Nothing
 ;; This function is called by:
-;;		_LCD_enablePulse
-;;		_LCD_setMode_data
-;;		_LCD_sendData
-;;		_LCD_setMode_command
-;;		_LCD_sendCommand
+;;		_LED_Toggle
 ;; This function uses a non-reentrant model
 ;;
-psect	text19,local,class=CODE,delta=2,merge=1,group=0
+psect	text17,local,class=CODE,delta=2,merge=1,group=0
 	file	"MCAL/MCAL_GPIO/GPIO.c"
 	line	54
-global __ptext19
-__ptext19:	;psect for function _GPIO_SetPinValue
-psect	text19
+global __ptext17
+__ptext17:	;psect for function _GPIO_SetPinValue
+psect	text17
 	file	"MCAL/MCAL_GPIO/GPIO.c"
 	line	54
 	
 _GPIO_SetPinValue:	
 ;incstack = 0
-;; hardware stack exceeded
-	callstack 0
+	callstack 2
 ; Regs used in _GPIO_SetPinValue: [wreg-fsr0h+status,2+status,0]
 	movwf	(GPIO_SetPinValue@Port)
 	line	56
 	
-l1011:	
-	goto	l1045
+l1150:	
+	goto	l1184
 	line	59
 	
-l1013:	
+l1152:	
 		decf	((GPIO_SetPinValue@Value)),w
 	btfss	status,2
-	goto	u681
-	goto	u680
-u681:
-	goto	l1017
-u680:
+	goto	u891
+	goto	u890
+u891:
+	goto	l1156
+u890:
 	line	60
 	
-l1015:	
+l1154:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinValue)
 	incf	(GPIO_SetPinValue@Pin),w
-	goto	u694
-u695:
+	goto	u904
+u905:
 	clrc
 	rlf	(??_GPIO_SetPinValue),f
-u694:
+u904:
 	addlw	-1
 	skipz
-	goto	u695
+	goto	u905
 	movf	(0+(??_GPIO_SetPinValue)),w
 	iorwf	(5),f	;volatile
-	goto	l95
+	goto	l106
 	line	62
 	
-l1017:	
+l1156:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinValue)
 	incf	(GPIO_SetPinValue@Pin),w
-	goto	u704
-u705:
+	goto	u914
+u915:
 	clrc
 	rlf	(??_GPIO_SetPinValue),f
-u704:
+u914:
 	addlw	-1
 	skipz
-	goto	u705
+	goto	u915
 	movf	(0+(??_GPIO_SetPinValue)),w
 	xorlw	0ffh
 	andwf	(5),f	;volatile
-	goto	l95
+	goto	l106
 	line	66
 	
-l1019:	
+l1158:	
 		decf	((GPIO_SetPinValue@Value)),w
 	btfss	status,2
-	goto	u711
-	goto	u710
-u711:
-	goto	l1023
-u710:
+	goto	u921
+	goto	u920
+u921:
+	goto	l1162
+u920:
 	line	67
 	
-l1021:	
+l1160:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinValue)
 	incf	(GPIO_SetPinValue@Pin),w
-	goto	u724
-u725:
+	goto	u934
+u935:
 	clrc
 	rlf	(??_GPIO_SetPinValue),f
-u724:
+u934:
 	addlw	-1
 	skipz
-	goto	u725
+	goto	u935
 	movf	(0+(??_GPIO_SetPinValue)),w
 	iorwf	(6),f	;volatile
-	goto	l95
+	goto	l106
 	line	69
 	
-l1023:	
+l1162:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinValue)
 	incf	(GPIO_SetPinValue@Pin),w
-	goto	u734
-u735:
+	goto	u944
+u945:
 	clrc
 	rlf	(??_GPIO_SetPinValue),f
-u734:
+u944:
 	addlw	-1
 	skipz
-	goto	u735
+	goto	u945
 	movf	(0+(??_GPIO_SetPinValue)),w
 	xorlw	0ffh
 	andwf	(6),f	;volatile
-	goto	l95
+	goto	l106
 	line	73
 	
-l1025:	
+l1164:	
 		decf	((GPIO_SetPinValue@Value)),w
 	btfss	status,2
-	goto	u741
-	goto	u740
-u741:
-	goto	l1029
-u740:
+	goto	u951
+	goto	u950
+u951:
+	goto	l1168
+u950:
 	line	74
 	
-l1027:	
+l1166:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinValue)
 	incf	(GPIO_SetPinValue@Pin),w
-	goto	u754
-u755:
+	goto	u964
+u965:
 	clrc
 	rlf	(??_GPIO_SetPinValue),f
-u754:
+u964:
 	addlw	-1
 	skipz
-	goto	u755
+	goto	u965
 	movf	(0+(??_GPIO_SetPinValue)),w
 	iorwf	(7),f	;volatile
-	goto	l95
+	goto	l106
 	line	76
 	
-l1029:	
+l1168:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinValue)
 	incf	(GPIO_SetPinValue@Pin),w
-	goto	u764
-u765:
+	goto	u974
+u975:
 	clrc
 	rlf	(??_GPIO_SetPinValue),f
-u764:
+u974:
 	addlw	-1
 	skipz
-	goto	u765
+	goto	u975
 	movf	(0+(??_GPIO_SetPinValue)),w
 	xorlw	0ffh
 	andwf	(7),f	;volatile
-	goto	l95
+	goto	l106
 	line	80
 	
-l1031:	
+l1170:	
 		decf	((GPIO_SetPinValue@Value)),w
 	btfss	status,2
-	goto	u771
-	goto	u770
-u771:
-	goto	l1035
-u770:
+	goto	u981
+	goto	u980
+u981:
+	goto	l1174
+u980:
 	line	81
 	
-l1033:	
+l1172:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinValue)
 	incf	(GPIO_SetPinValue@Pin),w
-	goto	u784
-u785:
+	goto	u994
+u995:
 	clrc
 	rlf	(??_GPIO_SetPinValue),f
-u784:
+u994:
 	addlw	-1
 	skipz
-	goto	u785
+	goto	u995
 	movf	(0+(??_GPIO_SetPinValue)),w
 	iorwf	(8),f	;volatile
-	goto	l95
+	goto	l106
 	line	83
 	
-l1035:	
+l1174:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinValue)
 	incf	(GPIO_SetPinValue@Pin),w
-	goto	u794
-u795:
+	goto	u1004
+u1005:
 	clrc
 	rlf	(??_GPIO_SetPinValue),f
-u794:
+u1004:
 	addlw	-1
 	skipz
-	goto	u795
+	goto	u1005
 	movf	(0+(??_GPIO_SetPinValue)),w
 	xorlw	0ffh
 	andwf	(8),f	;volatile
-	goto	l95
+	goto	l106
 	line	87
 	
-l1037:	
+l1176:	
 		decf	((GPIO_SetPinValue@Value)),w
 	btfss	status,2
-	goto	u801
-	goto	u800
-u801:
-	goto	l1041
-u800:
+	goto	u1011
+	goto	u1010
+u1011:
+	goto	l1180
+u1010:
 	line	88
 	
-l1039:	
+l1178:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinValue)
 	incf	(GPIO_SetPinValue@Pin),w
-	goto	u814
-u815:
+	goto	u1024
+u1025:
 	clrc
 	rlf	(??_GPIO_SetPinValue),f
-u814:
+u1024:
 	addlw	-1
 	skipz
-	goto	u815
+	goto	u1025
 	movf	(0+(??_GPIO_SetPinValue)),w
 	iorwf	(9),f	;volatile
-	goto	l95
+	goto	l106
 	line	90
 	
-l1041:	
+l1180:	
 	movlw	low(01h)
 	movwf	(??_GPIO_SetPinValue)
 	incf	(GPIO_SetPinValue@Pin),w
-	goto	u824
-u825:
+	goto	u1034
+u1035:
 	clrc
 	rlf	(??_GPIO_SetPinValue),f
-u824:
+u1034:
 	addlw	-1
 	skipz
-	goto	u825
+	goto	u1035
 	movf	(0+(??_GPIO_SetPinValue)),w
 	xorlw	0ffh
 	andwf	(9),f	;volatile
-	goto	l95
+	goto	l106
 	line	95
 	
-l1045:	
+l1184:	
 	movf	(GPIO_SetPinValue@Port),w
 	; Switch size 1, requested type "simple"
 ; Number of cases is 5, Range of values is 0 to 4
@@ -3157,30 +2718,227 @@ l1045:
 	asmopt off
 	xorlw	0^0	; case 0
 	skipnz
-	goto	l1013
+	goto	l1152
 	xorlw	1^0	; case 1
 	skipnz
-	goto	l1019
+	goto	l1158
 	xorlw	2^1	; case 2
 	skipnz
-	goto	l1025
+	goto	l1164
 	xorlw	3^2	; case 3
 	skipnz
-	goto	l1031
+	goto	l1170
 	xorlw	4^3	; case 4
 	skipnz
-	goto	l1037
-	goto	l95
+	goto	l1176
+	goto	l106
 	asmopt pop
 
 	line	96
 	
-l95:	
+l106:	
 	return
 	callstack 0
 GLOBAL	__end_of_GPIO_SetPinValue
 	__end_of_GPIO_SetPinValue:
 	signat	_GPIO_SetPinValue,12409
+	global	_GPIO_GetPinValue
+
+;; *************** function _GPIO_GetPinValue *****************
+;; Defined at:
+;;		line 99 in file "MCAL/MCAL_GPIO/GPIO.c"
+;; Parameters:    Size  Location     Type
+;;  Port            1    wreg     unsigned char 
+;;  Pin             1    0[BANK0 ] unsigned char 
+;; Auto vars:     Size  Location     Type
+;;  Port            1    2[BANK0 ] unsigned char 
+;;  Local_Value     1    3[BANK0 ] unsigned char 
+;; Return value:  Size  Location     Type
+;;                  1    wreg      unsigned char 
+;; Registers used:
+;;		wreg, fsr0l, fsr0h, status,2, status,0
+;; Tracked objects:
+;;		On entry : 300/0
+;;		On exit  : 300/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       1       0       0       0
+;;      Locals:         0       2       0       0       0
+;;      Temps:          0       1       0       0       0
+;;      Totals:         0       4       0       0       0
+;;Total ram usage:        4 bytes
+;; Hardware stack levels used: 1
+;; Hardware stack levels required when called: 4
+;; This function calls:
+;;		Nothing
+;; This function is called by:
+;;		_LED_Toggle
+;; This function uses a non-reentrant model
+;;
+psect	text18,local,class=CODE,delta=2,merge=1,group=0
+	line	99
+global __ptext18
+__ptext18:	;psect for function _GPIO_GetPinValue
+psect	text18
+	file	"MCAL/MCAL_GPIO/GPIO.c"
+	line	99
+	
+_GPIO_GetPinValue:	
+;incstack = 0
+	callstack 2
+; Regs used in _GPIO_GetPinValue: [wreg-fsr0h+status,2+status,0]
+	movwf	(GPIO_GetPinValue@Port)
+	line	101
+	
+l1186:	
+	clrf	(GPIO_GetPinValue@Local_Value)
+	line	103
+	goto	l1200
+	line	106
+	
+l1188:	
+	movf	(5),w	;volatile
+	movwf	(??_GPIO_GetPinValue)
+	incf	(GPIO_GetPinValue@Pin),w
+	goto	u1044
+u1045:
+	clrc
+	rrf	(??_GPIO_GetPinValue),f
+u1044:
+	addlw	-1
+	skipz
+	goto	u1045
+	movf	(0+(??_GPIO_GetPinValue)),w
+	movwf	(GPIO_GetPinValue@Local_Value)
+	movlw	low(01h)
+	andwf	(GPIO_GetPinValue@Local_Value),f
+	line	107
+	goto	l1202
+	line	110
+	
+l1190:	
+	movf	(6),w	;volatile
+	movwf	(??_GPIO_GetPinValue)
+	incf	(GPIO_GetPinValue@Pin),w
+	goto	u1054
+u1055:
+	clrc
+	rrf	(??_GPIO_GetPinValue),f
+u1054:
+	addlw	-1
+	skipz
+	goto	u1055
+	movf	(0+(??_GPIO_GetPinValue)),w
+	movwf	(GPIO_GetPinValue@Local_Value)
+	movlw	low(01h)
+	andwf	(GPIO_GetPinValue@Local_Value),f
+	line	111
+	goto	l1202
+	line	114
+	
+l1192:	
+	movf	(7),w	;volatile
+	movwf	(??_GPIO_GetPinValue)
+	incf	(GPIO_GetPinValue@Pin),w
+	goto	u1064
+u1065:
+	clrc
+	rrf	(??_GPIO_GetPinValue),f
+u1064:
+	addlw	-1
+	skipz
+	goto	u1065
+	movf	(0+(??_GPIO_GetPinValue)),w
+	movwf	(GPIO_GetPinValue@Local_Value)
+	movlw	low(01h)
+	andwf	(GPIO_GetPinValue@Local_Value),f
+	line	115
+	goto	l1202
+	line	118
+	
+l1194:	
+	movf	(8),w	;volatile
+	movwf	(??_GPIO_GetPinValue)
+	incf	(GPIO_GetPinValue@Pin),w
+	goto	u1074
+u1075:
+	clrc
+	rrf	(??_GPIO_GetPinValue),f
+u1074:
+	addlw	-1
+	skipz
+	goto	u1075
+	movf	(0+(??_GPIO_GetPinValue)),w
+	movwf	(GPIO_GetPinValue@Local_Value)
+	movlw	low(01h)
+	andwf	(GPIO_GetPinValue@Local_Value),f
+	line	119
+	goto	l1202
+	line	122
+	
+l1196:	
+	movf	(9),w	;volatile
+	movwf	(??_GPIO_GetPinValue)
+	incf	(GPIO_GetPinValue@Pin),w
+	goto	u1084
+u1085:
+	clrc
+	rrf	(??_GPIO_GetPinValue),f
+u1084:
+	addlw	-1
+	skipz
+	goto	u1085
+	movf	(0+(??_GPIO_GetPinValue)),w
+	movwf	(GPIO_GetPinValue@Local_Value)
+	movlw	low(01h)
+	andwf	(GPIO_GetPinValue@Local_Value),f
+	line	123
+	goto	l1202
+	line	127
+	
+l1200:	
+	movf	(GPIO_GetPinValue@Port),w
+	; Switch size 1, requested type "simple"
+; Number of cases is 5, Range of values is 0 to 4
+; switch strategies available:
+; Name         Instructions Cycles
+; simple_byte           16     9 (average)
+; direct_byte           23     8 (fixed)
+; jumptable            260     6 (fixed)
+;	Chosen strategy is simple_byte
+
+	asmopt push
+	asmopt off
+	xorlw	0^0	; case 0
+	skipnz
+	goto	l1188
+	xorlw	1^0	; case 1
+	skipnz
+	goto	l1190
+	xorlw	2^1	; case 2
+	skipnz
+	goto	l1192
+	xorlw	3^2	; case 3
+	skipnz
+	goto	l1194
+	xorlw	4^3	; case 4
+	skipnz
+	goto	l1196
+	goto	l1202
+	asmopt pop
+
+	line	129
+	
+l1202:	
+	movf	(GPIO_GetPinValue@Local_Value),w
+	line	130
+	
+l117:	
+	return
+	callstack 0
+GLOBAL	__end_of_GPIO_GetPinValue
+	__end_of_GPIO_GetPinValue:
+	signat	_GPIO_GetPinValue,8313
 	global	_ISR
 
 ;; *************** function _ISR *****************
@@ -3214,19 +2972,18 @@ GLOBAL	__end_of_GPIO_SetPinValue
 ;;		Interrupt level 1
 ;; This function uses a non-reentrant model
 ;;
-psect	text20,local,class=CODE,delta=2,merge=1,group=0
+psect	text19,local,class=CODE,delta=2,merge=1,group=0
 	file	"MCAL/MCAL_interrupt/interrupt.c"
 	line	86
-global __ptext20
-__ptext20:	;psect for function _ISR
-psect	text20
+global __ptext19
+__ptext19:	;psect for function _ISR
+psect	text19
 	file	"MCAL/MCAL_interrupt/interrupt.c"
 	line	86
 	
 _ISR:	
 ;incstack = 0
-;; hardware stack exceeded
-	callstack 0
+	callstack 1
 ; Regs used in _ISR: [wreg-fsr0h+status,2+status,0+pclath+cstack]
 psect	intentry,class=CODE,delta=2
 global __pintentry
@@ -3245,19 +3002,19 @@ interrupt_function:
 	movf	btemp1,w
 	movwf	(??_ISR+4)
 	ljmp	_ISR
-psect	text20
+psect	text19
 	line	89
 	
-i1l1239:	
+i1l1294:	
 	btfss	(11),(0)&7
-	goto	u130_21
-	goto	u130_20
-u130_21:
-	goto	i1l1245
-u130_20:
+	goto	u124_21
+	goto	u124_20
+u124_21:
+	goto	i1l1300
+u124_20:
 	line	93
 	
-i1l1241:	
+i1l1296:	
 	movlw	low(0FEh)
 	andwf	(11),f	;volatile
 	line	97
@@ -3265,37 +3022,37 @@ i1l1241:
 	bcf	status, 6	;RP1=0, select bank0
 	movf	((_Global_IOC_Callback)),w
 	btfsc	status,2
-	goto	u131_21
-	goto	u131_20
-u131_21:
-	goto	i1l1245
-u131_20:
+	goto	u125_21
+	goto	u125_20
+u125_21:
+	goto	i1l1300
+u125_20:
 	line	99
 	
-i1l1243:	
+i1l1298:	
 	movf	(_Global_IOC_Callback),w
 	fcall	i1fptable
 	line	107
 	
-i1l1245:	
+i1l1300:	
 	movf	(11),w	;volatile
 	movwf	(??_ISR)
 	movlw	01h
-u132_25:
+u126_25:
 	clrc
 	rrf	(??_ISR),f
 	addlw	-1
 	skipz
-	goto	u132_25
+	goto	u126_25
 	btfss	(0+(??_ISR)),(0)&7
-	goto	u133_21
-	goto	u133_20
-u133_21:
-	goto	i1l156
-u133_20:
+	goto	u127_21
+	goto	u127_20
+u127_21:
+	goto	i1l167
+u127_20:
 	line	110
 	
-i1l1247:	
+i1l1302:	
 	movlw	low(0FDh)
 	andwf	(11),f	;volatile
 	line	113
@@ -3303,19 +3060,19 @@ i1l1247:
 	bcf	status, 6	;RP1=0, select bank0
 	movf	((_Global_EXT_Callback)),w
 	btfsc	status,2
-	goto	u134_21
-	goto	u134_20
-u134_21:
-	goto	i1l156
-u134_20:
+	goto	u128_21
+	goto	u128_20
+u128_21:
+	goto	i1l167
+u128_20:
 	line	115
 	
-i1l1249:	
+i1l1304:	
 	movf	(_Global_EXT_Callback),w
 	fcall	i1fptable
 	line	121
 	
-i1l156:	
+i1l167:	
 	movf	(??_ISR+4),w
 	movwf	btemp1
 	movf	(??_ISR+3),w
@@ -3335,7 +3092,7 @@ GLOBAL	__end_of_ISR
 
 ;; *************** function _pedestrian_buttons_ISR *****************
 ;; Defined at:
-;;		line 16 in file "APP/main.c"
+;;		line 28 in file "APP/main_hardware_UART.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
@@ -3362,27 +3119,27 @@ GLOBAL	__end_of_ISR
 ;;		_ISR
 ;; This function uses a non-reentrant model
 ;;
-psect	text21,local,class=CODE,delta=2,merge=1,group=0
-	file	"APP/main.c"
-	line	16
-global __ptext21
-__ptext21:	;psect for function _pedestrian_buttons_ISR
-psect	text21
-	file	"APP/main.c"
-	line	16
+psect	text20,local,class=CODE,delta=2,merge=1,group=0
+	file	"APP/main_hardware_UART.c"
+	line	28
+global __ptext20
+__ptext20:	;psect for function _pedestrian_buttons_ISR
+psect	text20
+	file	"APP/main_hardware_UART.c"
+	line	28
 	
 _pedestrian_buttons_ISR:	
 ;incstack = 0
-	callstack 1
+	callstack 3
 ; Regs used in _pedestrian_buttons_ISR: []
-	line	18
+	line	30
 	
-i1l1175:	
+i1l1206:	
 	movlw	01h
 	movwf	(_pedestrianPressed)	;volatile
-	line	19
+	line	31
 	
-i1l33:	
+i1l41:	
 	return
 	callstack 0
 GLOBAL	__end_of_pedestrian_buttons_ISR
@@ -3392,7 +3149,7 @@ GLOBAL	__end_of_pedestrian_buttons_ISR
 
 ;; *************** function _objectDetected_IR_ISR *****************
 ;; Defined at:
-;;		line 21 in file "APP/main.c"
+;;		line 33 in file "APP/main_hardware_UART.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
@@ -3423,84 +3180,83 @@ GLOBAL	__end_of_pedestrian_buttons_ISR
 ;;		_ISR
 ;; This function uses a non-reentrant model
 ;;
-psect	text22,local,class=CODE,delta=2,merge=1,group=0
-	line	21
-global __ptext22
-__ptext22:	;psect for function _objectDetected_IR_ISR
-psect	text22
-	file	"APP/main.c"
-	line	21
+psect	text21,local,class=CODE,delta=2,merge=1,group=0
+	line	33
+global __ptext21
+__ptext21:	;psect for function _objectDetected_IR_ISR
+psect	text21
+	file	"APP/main_hardware_UART.c"
+	line	33
 	
 _objectDetected_IR_ISR:	
 ;incstack = 0
-;; hardware stack exceeded
-	callstack 0
+	callstack 1
 ; Regs used in _objectDetected_IR_ISR: [wreg-fsr0h+status,2+status,0+pclath+cstack]
-	line	25
+	line	37
 	
-i1l1177:	
+i1l1208:	
 	movlw	low(07h)
 	fcall	_IR_ReadState
 	movwf	(objectDetected_IR_ISR@pin1)
-	line	26
+	line	38
 	movlw	low(06h)
 	fcall	_IR_ReadState
 	movwf	(objectDetected_IR_ISR@pin2)
-	line	27
+	line	39
 	movlw	low(05h)
 	fcall	_IR_ReadState
 	movwf	(objectDetected_IR_ISR@pin3)
-	line	28
+	line	40
 	movlw	low(04h)
 	fcall	_IR_ReadState
 	movwf	(objectDetected_IR_ISR@pin4)
-	line	30
+	line	42
 	
-i1l1179:	
+i1l1210:	
 	movf	((objectDetected_IR_ISR@pin1)),w
 	btfss	status,2
+	goto	u109_21
+	goto	u109_20
+u109_21:
+	goto	i1l46
+u109_20:
+	
+i1l1212:	
+	movf	((objectDetected_IR_ISR@pin2)),w
+	btfss	status,2
+	goto	u110_21
+	goto	u110_20
+u110_21:
+	goto	i1l46
+u110_20:
+	
+i1l1214:	
+	movf	((objectDetected_IR_ISR@pin3)),w
+	btfss	status,2
+	goto	u111_21
+	goto	u111_20
+u111_21:
+	goto	i1l46
+u111_20:
+	
+i1l1216:	
+	movf	((objectDetected_IR_ISR@pin4)),w
+	btfsc	status,2
 	goto	u112_21
 	goto	u112_20
 u112_21:
-	goto	i1l38
+	goto	i1l47
 u112_20:
 	
-i1l1181:	
-	movf	((objectDetected_IR_ISR@pin2)),w
-	btfss	status,2
-	goto	u113_21
-	goto	u113_20
-u113_21:
-	goto	i1l38
-u113_20:
-	
-i1l1183:	
-	movf	((objectDetected_IR_ISR@pin3)),w
-	btfss	status,2
-	goto	u114_21
-	goto	u114_20
-u114_21:
-	goto	i1l38
-u114_20:
-	
-i1l1185:	
-	movf	((objectDetected_IR_ISR@pin4)),w
-	btfsc	status,2
-	goto	u115_21
-	goto	u115_20
-u115_21:
-	goto	i1l39
-u115_20:
-	
-i1l38:	
-	line	32
+i1l46:	
+	line	44
 	movlw	01h
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(_objectDetected)	;volatile
-	line	35
+	line	47
 	
-i1l39:	
+i1l47:	
 	return
 	callstack 0
 GLOBAL	__end_of_objectDetected_IR_ISR
@@ -3532,60 +3288,59 @@ GLOBAL	__end_of_objectDetected_IR_ISR
 ;; Hardware stack levels used: 1
 ;; Hardware stack levels required when called: 1
 ;; This function calls:
-;;		_GPIO_GetPinValue
+;;		i1_GPIO_GetPinValue
 ;; This function is called by:
 ;;		_objectDetected_IR_ISR
 ;; This function uses a non-reentrant model
 ;;
-psect	text23,local,class=CODE,delta=2,merge=1,group=0
+psect	text22,local,class=CODE,delta=2,merge=1,group=0
 	file	"HAL/HAL_IR/HAL_IR.c"
 	line	18
-global __ptext23
-__ptext23:	;psect for function _IR_ReadState
-psect	text23
+global __ptext22
+__ptext22:	;psect for function _IR_ReadState
+psect	text22
 	file	"HAL/HAL_IR/HAL_IR.c"
 	line	18
 	
 _IR_ReadState:	
 ;incstack = 0
-;; hardware stack exceeded
-	callstack 0
+	callstack 1
 ; Regs used in _IR_ReadState: [wreg-fsr0h+status,2+status,0+pclath+cstack]
 	movwf	(IR_ReadState@sensorPin)
 	line	21
 	
-i1l1113:	
+i1l1094:	
 	movf	(IR_ReadState@sensorPin),w
-	movwf	(GPIO_GetPinValue@Pin)
+	movwf	(i1GPIO_GetPinValue@Pin)
 	movlw	low(01h)
-	fcall	_GPIO_GetPinValue
+	fcall	i1_GPIO_GetPinValue
 	xorlw	0
 	skipz
-	goto	u109_21
-	goto	u109_20
-u109_21:
-	goto	i1l1121
-u109_20:
+	goto	u85_21
+	goto	u85_20
+u85_21:
+	goto	i1l1102
+u85_20:
 	line	24
 	
-i1l1115:	
+i1l1096:	
 	movlw	low(01h)
-	goto	i1l194
+	goto	i1l225
 	line	29
 	
-i1l1121:	
+i1l1102:	
 	movlw	low(0)
 	line	32
 	
-i1l194:	
+i1l225:	
 	return
 	callstack 0
 GLOBAL	__end_of_IR_ReadState
 	__end_of_IR_ReadState:
 	signat	_IR_ReadState,4217
-	global	_GPIO_GetPinValue
+	global	i1_GPIO_GetPinValue
 
-;; *************** function _GPIO_GetPinValue *****************
+;; *************** function i1_GPIO_GetPinValue *****************
 ;; Defined at:
 ;;		line 99 in file "MCAL/MCAL_GPIO/GPIO.c"
 ;; Parameters:    Size  Location     Type
@@ -3615,141 +3370,140 @@ GLOBAL	__end_of_IR_ReadState
 ;;		_IR_ReadState
 ;; This function uses a non-reentrant model
 ;;
-psect	text24,local,class=CODE,delta=2,merge=1,group=0
+psect	text23,local,class=CODE,delta=2,merge=1,group=0
 	file	"MCAL/MCAL_GPIO/GPIO.c"
 	line	99
-global __ptext24
-__ptext24:	;psect for function _GPIO_GetPinValue
-psect	text24
+global __ptext23
+__ptext23:	;psect for function i1_GPIO_GetPinValue
+psect	text23
 	file	"MCAL/MCAL_GPIO/GPIO.c"
 	line	99
 	
-_GPIO_GetPinValue:	
+i1_GPIO_GetPinValue:	
 ;incstack = 0
-;; hardware stack exceeded
-	callstack 0
-; Regs used in _GPIO_GetPinValue: [wreg-fsr0h+status,2+status,0]
-	movwf	(GPIO_GetPinValue@Port)
+	callstack 1
+; Regs used in i1_GPIO_GetPinValue: [wreg-fsr0h+status,2+status,0]
+	movwf	(i1GPIO_GetPinValue@Port)
 	line	101
 	
-i1l1091:	
-	clrf	(GPIO_GetPinValue@Local_Value)
+i1l1074:	
+	clrf	(i1GPIO_GetPinValue@Local_Value)
 	line	103
-	goto	i1l1105
+	goto	i1l1088
 	line	106
 	
-i1l1093:	
+i1l1076:	
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(5),w	;volatile
-	movwf	(??_GPIO_GetPinValue)
-	incf	(GPIO_GetPinValue@Pin),w
-	goto	u98_24
-u98_25:
+	movwf	(??i1_GPIO_GetPinValue)
+	incf	(i1GPIO_GetPinValue@Pin),w
+	goto	u80_24
+u80_25:
 	clrc
-	rrf	(??_GPIO_GetPinValue),f
-u98_24:
+	rrf	(??i1_GPIO_GetPinValue),f
+u80_24:
 	addlw	-1
 	skipz
-	goto	u98_25
-	movf	(0+(??_GPIO_GetPinValue)),w
-	movwf	(GPIO_GetPinValue@Local_Value)
+	goto	u80_25
+	movf	(0+(??i1_GPIO_GetPinValue)),w
+	movwf	(i1GPIO_GetPinValue@Local_Value)
 	movlw	low(01h)
-	andwf	(GPIO_GetPinValue@Local_Value),f
+	andwf	(i1GPIO_GetPinValue@Local_Value),f
 	line	107
-	goto	i1l1107
+	goto	i1l1090
 	line	110
 	
-i1l1095:	
+i1l1078:	
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(6),w	;volatile
-	movwf	(??_GPIO_GetPinValue)
-	incf	(GPIO_GetPinValue@Pin),w
-	goto	u99_24
-u99_25:
+	movwf	(??i1_GPIO_GetPinValue)
+	incf	(i1GPIO_GetPinValue@Pin),w
+	goto	u81_24
+u81_25:
 	clrc
-	rrf	(??_GPIO_GetPinValue),f
-u99_24:
+	rrf	(??i1_GPIO_GetPinValue),f
+u81_24:
 	addlw	-1
 	skipz
-	goto	u99_25
-	movf	(0+(??_GPIO_GetPinValue)),w
-	movwf	(GPIO_GetPinValue@Local_Value)
+	goto	u81_25
+	movf	(0+(??i1_GPIO_GetPinValue)),w
+	movwf	(i1GPIO_GetPinValue@Local_Value)
 	movlw	low(01h)
-	andwf	(GPIO_GetPinValue@Local_Value),f
+	andwf	(i1GPIO_GetPinValue@Local_Value),f
 	line	111
-	goto	i1l1107
+	goto	i1l1090
 	line	114
 	
-i1l1097:	
+i1l1080:	
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(7),w	;volatile
-	movwf	(??_GPIO_GetPinValue)
-	incf	(GPIO_GetPinValue@Pin),w
-	goto	u100_24
-u100_25:
+	movwf	(??i1_GPIO_GetPinValue)
+	incf	(i1GPIO_GetPinValue@Pin),w
+	goto	u82_24
+u82_25:
 	clrc
-	rrf	(??_GPIO_GetPinValue),f
-u100_24:
+	rrf	(??i1_GPIO_GetPinValue),f
+u82_24:
 	addlw	-1
 	skipz
-	goto	u100_25
-	movf	(0+(??_GPIO_GetPinValue)),w
-	movwf	(GPIO_GetPinValue@Local_Value)
+	goto	u82_25
+	movf	(0+(??i1_GPIO_GetPinValue)),w
+	movwf	(i1GPIO_GetPinValue@Local_Value)
 	movlw	low(01h)
-	andwf	(GPIO_GetPinValue@Local_Value),f
+	andwf	(i1GPIO_GetPinValue@Local_Value),f
 	line	115
-	goto	i1l1107
+	goto	i1l1090
 	line	118
 	
-i1l1099:	
+i1l1082:	
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(8),w	;volatile
-	movwf	(??_GPIO_GetPinValue)
-	incf	(GPIO_GetPinValue@Pin),w
-	goto	u101_24
-u101_25:
+	movwf	(??i1_GPIO_GetPinValue)
+	incf	(i1GPIO_GetPinValue@Pin),w
+	goto	u83_24
+u83_25:
 	clrc
-	rrf	(??_GPIO_GetPinValue),f
-u101_24:
+	rrf	(??i1_GPIO_GetPinValue),f
+u83_24:
 	addlw	-1
 	skipz
-	goto	u101_25
-	movf	(0+(??_GPIO_GetPinValue)),w
-	movwf	(GPIO_GetPinValue@Local_Value)
+	goto	u83_25
+	movf	(0+(??i1_GPIO_GetPinValue)),w
+	movwf	(i1GPIO_GetPinValue@Local_Value)
 	movlw	low(01h)
-	andwf	(GPIO_GetPinValue@Local_Value),f
+	andwf	(i1GPIO_GetPinValue@Local_Value),f
 	line	119
-	goto	i1l1107
+	goto	i1l1090
 	line	122
 	
-i1l1101:	
+i1l1084:	
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(9),w	;volatile
-	movwf	(??_GPIO_GetPinValue)
-	incf	(GPIO_GetPinValue@Pin),w
-	goto	u102_24
-u102_25:
+	movwf	(??i1_GPIO_GetPinValue)
+	incf	(i1GPIO_GetPinValue@Pin),w
+	goto	u84_24
+u84_25:
 	clrc
-	rrf	(??_GPIO_GetPinValue),f
-u102_24:
+	rrf	(??i1_GPIO_GetPinValue),f
+u84_24:
 	addlw	-1
 	skipz
-	goto	u102_25
-	movf	(0+(??_GPIO_GetPinValue)),w
-	movwf	(GPIO_GetPinValue@Local_Value)
+	goto	u84_25
+	movf	(0+(??i1_GPIO_GetPinValue)),w
+	movwf	(i1GPIO_GetPinValue@Local_Value)
 	movlw	low(01h)
-	andwf	(GPIO_GetPinValue@Local_Value),f
+	andwf	(i1GPIO_GetPinValue@Local_Value),f
 	line	123
-	goto	i1l1107
+	goto	i1l1090
 	line	127
 	
-i1l1105:	
-	movf	(GPIO_GetPinValue@Port),w
+i1l1088:	
+	movf	(i1GPIO_GetPinValue@Port),w
 	; Switch size 1, requested type "simple"
 ; Number of cases is 5, Range of values is 0 to 4
 ; switch strategies available:
@@ -3763,34 +3517,34 @@ i1l1105:
 	asmopt off
 	xorlw	0^0	; case 0
 	skipnz
-	goto	i1l1093
+	goto	i1l1076
 	xorlw	1^0	; case 1
 	skipnz
-	goto	i1l1095
+	goto	i1l1078
 	xorlw	2^1	; case 2
 	skipnz
-	goto	i1l1097
+	goto	i1l1080
 	xorlw	3^2	; case 3
 	skipnz
-	goto	i1l1099
+	goto	i1l1082
 	xorlw	4^3	; case 4
 	skipnz
-	goto	i1l1101
-	goto	i1l1107
+	goto	i1l1084
+	goto	i1l1090
 	asmopt pop
 
 	line	129
 	
-i1l1107:	
-	movf	(GPIO_GetPinValue@Local_Value),w
+i1l1090:	
+	movf	(i1GPIO_GetPinValue@Local_Value),w
 	line	130
 	
-i1l106:	
+i1l117:	
 	return
 	callstack 0
-GLOBAL	__end_of_GPIO_GetPinValue
-	__end_of_GPIO_GetPinValue:
-	signat	_GPIO_GetPinValue,8313
+GLOBAL	__end_ofi1_GPIO_GetPinValue
+	__end_ofi1_GPIO_GetPinValue:
+	signat	i1_GPIO_GetPinValue,8281
 global	___latbits
 ___latbits	equ	2
 	global	fptotal

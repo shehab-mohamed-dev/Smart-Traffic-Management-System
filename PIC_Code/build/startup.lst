@@ -1,7 +1,7 @@
 
 
 Microchip MPLAB XC8 Assembler V3.10 build 20250813170317 
-                                                                                                           Wed May 13 17:13:09 2026
+                                                                                                           Fri May 15 15:44:30 2026
 
 
      1                           	processor	16F877A
@@ -52,13 +52,13 @@ Microchip MPLAB XC8 Assembler V3.10 build 20250813170317
     46                           ; -q --opt=none --chip=16f877a --opt=+s \
     47                           ; --dfp=C:/Users/Ziad/Desktop/Academic/College zewail city/Courses/CIE/Year 4/CIE 408 Embedded Syste
       +                          ms/Compiler/Microchip.PIC16Fxxx_DFP.1.7.162/xc8 \
-    48                           ; -I. -IMCAL/MCAL_GPIO -IMCAL/MCAL_UART -IMCAL/MCAL_interrupt \
-    49                           ; -IHAL/HAL_IR -IHAL/HAL_LCD -ISERVICES APP/main.c \
+    48                           ; -I. -IMCAL/MCAL_GPIO -IMCAL/MCAL_interrupt -IMCAL/MCAL_UART \
+    49                           ; -IHAL/HAL_LED -IHAL/HAL_IR -ISERVICES APP/main_hardware_UART.c \
     50                           ; MCAL/MCAL_GPIO/GPIO.c MCAL/MCAL_interrupt/interrupt.c \
-    51                           ; MCAL/MCAL_UART/UART.c HAL/HAL_IR/HAL_IR.c HAL/HAL_LCD/HAL_LCD.c \
-    52                           ; -otest.hex --objdir=build --outdir=build -L--fixupoverflow=error \
-    53                           ; --std=c99 --rors --icl=auto --callgraph=none --warn=-3 \
-    54                           ; --errformat=%f:%l:%c: error: (%n) %s \
+    51                           ; MCAL/MCAL_UART/UART.c HAL/HAL_LED/HAL_LED.c HAL/HAL_IR/HAL_IR.c \
+    52                           ; -otest_Hardware_UART.hex --objdir=build --outdir=build \
+    53                           ; -L--fixupoverflow=error --std=c99 --rors --icl=auto --callgraph=none \
+    54                           ; --warn=-3 --errformat=%f:%l:%c: error: (%n) %s \
     55                           ; --warnformat=%f:%l:%c: warning: (%n) %s \
     56                           ; --msgformat=%f:%l:%c: advisory: (%n) %s
     57                           ;
@@ -106,9 +106,9 @@ Microchip MPLAB XC8 Assembler V3.10 build 20250813170317
 
 
 Microchip Technology PIC Macro Assembler V3.10 build 20250813170317 
-Symbol Table                                                                                               Wed May 13 17:13:09 2026
+Symbol Table                                                                                               Fri May 15 15:44:30 2026
 
-               ___sp 0054                 _main 03D9                 start 0010           ___stack_hi 0054  
+               ___sp 0054                 _main 0174                 start 0010           ___stack_hi 0054  
          ___stack_lo 0054       ___int_stack_hi 0054       ___int_stack_lo 0054  start_initialization 0013  
           ___heap_hi 0000            ___heap_lo 0000            ___stackhi 0000            ___stacklo 0000  
            ___int_sp 0054             intlevel0 001D             intlevel1 001D             intlevel2 001D  

@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "gpio_interface.h": "c",
+        "interrupt_private.h": "c",
+        "hal_led_interface.h": "c",
+        "hal_ir_interface.h": "c"
+    }
+}
